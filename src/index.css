@@ -15,6 +15,11 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  /* Offset scroll target so sticky header doesn't cover anchored sections */
+  section[id] {
+    scroll-margin-top: 96px;
   }
 }
 
@@ -59,6 +64,48 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Brand violet — primary CTAs, headings accent, education cards */
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-200: #ddd6fe;
+  --color-brand-300: #c4b5fd;
+  --color-brand-400: #a78bfa;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-brand-800: #5b21b6;
+  --color-brand-900: #4c1d95;
+  --color-brand-950: #3730a3;
+
+  /* Accent amber — open-to-collab badge, &Ranj */
+  --color-amber-50: #fef3c7;
+  --color-amber-100: #fde68a;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #92400e;
+  --color-amber-900: #78350f;
+
+  /* Sky — Netcompany */
+  --color-sky-50: #f0f9ff;
+  --color-sky-200: #bae6fd;
+  --color-sky-300: #38bdf8;
+  --color-sky-500: #0284c7;
+  --color-sky-700: #0369a1;
+  --color-sky-900: #0c4a6e;
+
+  /* Pink — Long Covid + exec(ut) */
+  --color-pink-100: #fce7f3;
+  --color-pink-300: #f0abfc;
+  --color-pink-500: #ec4899;
+  --color-pink-700: #be185d;
+  --color-pink-900: #831843;
+
+  /* Neutral additions for warm whites used in the design */
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f7f7f5;
+  --color-stone-150: #f5f5f4;
 }
 
 :root {
