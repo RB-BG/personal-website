@@ -34,14 +34,14 @@ function Hero() {
       </ParallaxShape>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl">
-        <FadeIn immediate delay={0.1}>
+        <FadeIn immediate delay={0.1} duration={0.9}>
           <Badge variant="amber" className="mb-14">
             <span className="inline-block size-[7px] rounded-full bg-amber-500" />
             Open to collaboration
           </Badge>
         </FadeIn>
 
-        <FadeIn immediate delay={0.25}>
+        <FadeIn immediate delay={0.25} duration={0.9}>
           <h1 className="mb-10 max-w-[1200px] text-[clamp(56px,9.5vw,148px)] leading-[0.92] font-bold tracking-[-0.05em] text-stone-950">
             Product manager,
             <br />
@@ -52,7 +52,7 @@ function Hero() {
           </h1>
         </FadeIn>
 
-        <FadeIn immediate delay={0.4}>
+        <FadeIn immediate delay={0.4} duration={0.9}>
           <p className="mb-16 max-w-[620px] text-[22px] leading-[1.55] text-stone-600">
             I work at the intersection of technology, product strategy and user
             experience &mdash; shaping products from vision to launch. Currently
@@ -60,7 +60,7 @@ function Hero() {
           </p>
         </FadeIn>
 
-        <FadeIn immediate delay={0.55}>
+        <FadeIn immediate delay={0.55} duration={0.9}>
           <div className="flex flex-wrap items-center gap-4">
             <a
               href="#work"
