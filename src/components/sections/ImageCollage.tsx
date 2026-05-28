@@ -4,40 +4,26 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { type Project } from "@/content/projects"
 
-// ---- image config ----
+// ---- constants ----
 
-type ImgType = "landscape" | "portrait" | "square"
+const TARGET_ROW_H = 220  // px — base row height before row-fill scaling
+const GAP = 8             // px — gap between images
 
 /**
- * Pre-defined aspect ratios for the placeholder grid.
- * When real images are wired up, swap each ratio for the image's
- * intrinsic width/height ratio.
+ * Placeholder images: numeric aspect ratios (width / height).
+ * Replace with real image ratios once uploads are wired up.
  */
-const IMAGES: ReadonlyArray<{ type: ImgType; ratio: string }> = [
-  { type: "landscape", ratio: "16/9" },
-  { type: "portrait",  ratio: "2/3"  },
-  { type: "square",    ratio: "1/1"  },
-  { type: "landscape", ratio: "4/3"  },
-  { type: "square",    ratio: "1/1"  },
-  { type: "portrait",  ratio: "3/4"  },
-  { type: "landscape", ratio: "16/9" },
-  { type: "square",    ratio: "1/1"  },
-  { type: "portrait",  ratio: "2/3"  },
+const IMAGE_RATIOS = [
+  16 / 9,  // landscape
+   2 / 3,  // portrait
+   1 / 1,  // square
+   4 / 3,  // landscape
+   1 / 1,  // square
+   3 / 4,  // portrait
+  16 / 9,  // landscape
+   1 / 1,  // square
+   2 / 3,  // portrait
 ]
-
-/** Columns each image spans in the 3-col grid when at rest. */
-function normalSpan(type: ImgType): number {
-  return type === "landscape" ? 2 : 1
-}
-
-/**
- * Columns each image spans when selected (clicked).
- *   landscape → full row (3 cols) — pushes neighbours to next row
- *   portrait / square → 2 cols — taller at wider width, extends the grid
- */
-function featuredSpan(type: ImgType): number {
-  return type === "landscape" ? 3 : 2
-}
 
 // ---- entrance animation config ----
 
@@ -53,7 +39,92 @@ const ENTRANCE = [
   { delay: 0.11, stiffness: 360, damping: 11, rotate: -3 },
 ] as const
 
-// ---- helpers ----
+// ---- justified layout algorithm ----
+
+interface LayoutItem {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+/**
+ * Packs images into rows such that each row fills `containerW` exactly,
+ * with every image at the same visual row height.
+ *
+ * When `selectedIdx` is set, that image gets 2× target height, making it
+ * larger and changing which images land in the same row.
+ *
+ * Last row: scaled to fill only if it's ≥ 60 % full; otherwise left-aligned
+ * to avoid grotesquely stretched single images.
+ */
+function computeLayout(
+  ratios: number[],
+  containerW: number,
+  selectedIdx: number | null,
+): { items: LayoutItem[]; totalH: number } {
+  if (containerW === 0) return { items: ratios.map(() => ({ x: 0, y: 0, w: 0, h: 0 })), totalH: 0 }
+
+  // Effective target height per image (selected = 2×)
+  const effH = ratios.map((_, i) =>
+    i === selectedIdx ? TARGET_ROW_H * 2 : TARGET_ROW_H,
+  )
+  // Preferred width at effective height
+  const prefW = ratios.map((r, i) => r * effH[i])
+
+  // Pack indices into rows
+  const rows: number[][] = []
+  let row: number[] = []
+  let rowW = 0
+
+  for (let i = 0; i < ratios.length; i++) {
+    const extra = row.length > 0 ? GAP + prefW[i] : prefW[i]
+    if (row.length > 0 && rowW + extra > containerW) {
+      rows.push([...row])
+      row = [i]
+      rowW = prefW[i]
+    } else {
+      row.push(i)
+      rowW += extra
+    }
+  }
+  if (row.length > 0) rows.push(row)
+
+  const items: LayoutItem[] = Array(ratios.length)
+  let y = 0
+
+  for (let r = 0; r < rows.length; r++) {
+    const indices = rows[r]
+    const isLast = r === rows.length - 1
+    const totalPref = indices.reduce((s, i) => s + prefW[i], 0)
+    const gaps = (indices.length - 1) * GAP
+    const naturalW = totalPref + gaps
+
+    // Scale to fill container width — unless it's the last row and it's sparse
+    const scale =
+      isLast && naturalW < containerW * 0.6
+        ? 1
+        : (containerW - gaps) / totalPref
+
+    // Row height is the tallest scaled image in this row
+    const rowH = Math.max(...indices.map((i) => effH[i] * scale))
+
+    let x = 0
+    for (const i of indices) {
+      const w = prefW[i] * scale
+      const h = effH[i] * scale
+      // Vertically centre shorter images (e.g. regular next to 2× selected)
+      items[i] = { x, y: y + (rowH - h) / 2, w, h }
+      x += w + GAP
+    }
+
+    y += rowH + GAP
+  }
+
+  return { items, totalH: Math.max(0, y - GAP) }
+}
+
+// ---- gradient helpers ----
 
 function getGradients({ from, via, to }: Project["gradient"]): string[] {
   return [
@@ -69,24 +140,36 @@ function getGradients({ from, via, to }: Project["gradient"]): string[] {
   ]
 }
 
-// ---- inner component (remounts per project, auto-resets state) ----
+// ---- inner component ----
 
 type GridProps = { project: Project; onClose: () => void }
 
 function ImageCollageGrid({ project, onClose }: GridProps) {
+  const [containerW, setContainerW] = useState(680)
   const [scales, setScales] = useState<number[]>(() =>
-    Array(IMAGES.length).fill(1),
+    Array(IMAGE_RATIOS.length).fill(1),
   )
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
+
+  const containerRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
-  /**
-   * One ref per image so we can read their bounding boxes for the wave.
-   * Stored in a ref-of-array to avoid re-renders on assignment.
-   */
   const itemRefs = useRef<Array<HTMLDivElement | null>>(
-    Array(IMAGES.length).fill(null),
+    Array(IMAGE_RATIOS.length).fill(null),
   )
+
   const gradients = getGradients(project.gradient)
+  const layout = computeLayout(IMAGE_RATIOS, containerW, selectedIdx)
+
+  // Measure container width (responsive)
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      setContainerW(entry.contentRect.width)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   // Body scroll lock + initial focus
   useEffect(() => {
@@ -110,34 +193,26 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
   }, [selectedIdx, onClose])
 
   /**
-   * Hover wave.
-   * Measures the pixel distance from the hovered image's centre to every
-   * other image's centre, then applies an exponential decay:
-   *   hovered image  → 1.12  (grows)
-   *   close neighbour → ~0.88 (shrinks most)
-   *   distant image   → ~0.97 (barely moves)
+   * Hover wave — exponential falloff from hovered image centre.
+   * Hovered: 1.10 (grows), direct neighbour: ~0.86, far: ~0.98.
    */
   const handleMouseEnter = useCallback(
     (i: number) => {
       if (selectedIdx !== null) return
-
       const el = itemRefs.current[i]
       if (!el) return
-
       const { left, top, width, height } = el.getBoundingClientRect()
       const cx = left + width / 2
       const cy = top + height / 2
-
       setScales(
         itemRefs.current.map((ref, j) => {
           if (!ref) return 1
-          if (j === i) return 1.12
+          if (j === i) return 1.10
           const r = ref.getBoundingClientRect()
           const dist = Math.hypot(
             cx - (r.left + r.width / 2),
             cy - (r.top + r.height / 2),
           )
-          // Exponential falloff: strong nearby, fades to ~1.0 at 600+ px
           return 1 - 0.16 * Math.exp(-dist / 280)
         }),
       )
@@ -146,15 +221,11 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
   )
 
   const handleMouseLeave = useCallback(() => {
-    setScales(Array(IMAGES.length).fill(1))
+    setScales(Array(IMAGE_RATIOS.length).fill(1))
   }, [])
 
-  /**
-   * Click to feature / deselect.
-   * Resets hover scales first so the wave doesn't linger during reflow.
-   */
   const handleClick = useCallback((i: number) => {
-    setScales(Array(IMAGES.length).fill(1))
+    setScales(Array(IMAGE_RATIOS.length).fill(1))
     setSelectedIdx((prev) => (prev === i ? null : i))
   }, [])
 
@@ -179,38 +250,35 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       </div>
 
       {/*
-       * Scrollable wrapper so a tall featured portrait doesn't overflow
-       * the viewport after the grid expands.
+       * Scrollable grid container.
+       * scrollbar-width: none hides the scrollbar while keeping it functional.
        */}
       <div
+        ref={containerRef}
         className="pointer-events-auto"
         style={{
           width: "min(80vw, 680px)",
           maxHeight: "calc(100vh - 180px)",
           overflowY: "auto",
+          scrollbarWidth: "none",
         }}
       >
         <LayoutGroup>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gridAutoFlow: "dense",
-              alignItems: "start",
-              gap: "8px",
-            }}
+          {/* Absolutely-positioned grid — height driven by computed layout */}
+          <motion.div
+            layout
+            style={{ position: "relative", height: layout.totalH }}
           >
-            {IMAGES.map((img, i) => {
-              const isSelected = selectedIdx === i
-              const span = isSelected ? featuredSpan(img.type) : normalSpan(img.type)
+            {IMAGE_RATIOS.map((_, i) => {
+              const item = layout.items[i]
               const cfg = ENTRANCE[i]
+              const isSelected = selectedIdx === i
 
               return (
                 /*
-                 * Layout layer — owns grid positioning and animates reflow
-                 * when gridColumn span changes (click to feature/deselect).
-                 * framer-motion FLIP: captures bounding box before and after
-                 * the DOM update, then plays a spring from old → new.
+                 * Layout layer — absolute position set by the justified
+                 * algorithm. framer-motion FLIP animates from old → new
+                 * bounding box whenever layout recomputes (selectedIdx change).
                  */
                 <motion.div
                   key={i}
@@ -222,10 +290,13 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                     layout: { type: "spring", stiffness: 260, damping: 28 },
                   }}
                   style={{
-                    gridColumn: `span ${span}`,
-                    aspectRatio: img.ratio,
-                    position: "relative",
+                    position: "absolute",
+                    left: item?.x ?? 0,
+                    top: item?.y ?? 0,
+                    width: item?.w ?? 0,
+                    height: item?.h ?? 0,
                     cursor: "pointer",
+                    borderRadius: 14,
                   }}
                   onMouseEnter={() => handleMouseEnter(i)}
                   onMouseLeave={handleMouseLeave}
@@ -234,27 +305,19 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                     handleClick(i)
                   }}
                 >
-                  {/*
-                   * Wave scale layer — kept separate from the layout layer so
-                   * the two transforms don't compound during simultaneous
-                   * layout + scale animations.
-                   */}
+                  {/* Wave scale layer — isolated so it doesn't compound with FLIP */}
                   <motion.div
                     animate={{ scale: scales[i] }}
                     transition={{ type: "spring", stiffness: 380, damping: 32 }}
                     style={{
                       position: "absolute",
                       inset: 0,
-                      borderRadius: "14px",
+                      borderRadius: 14,
                       overflow: "hidden",
                       background: gradients[i],
                     }}
                   >
-                    {/*
-                     * Entrance layer — one-time bubbly spring on mount.
-                     * Separated from the wave layer so the entrance delay
-                     * never bleeds into hover transitions.
-                     */}
+                    {/* Entrance layer — one-time bubbly spring, delay isolated here */}
                     <motion.div
                       initial={{ scale: 0.55, opacity: 0, rotate: cfg.rotate }}
                       animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -266,7 +329,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                       }}
                       style={{ position: "absolute", inset: 0, background: gradients[i] }}
                     >
-                      {/* Subtle grid texture */}
+                      {/* Grid texture */}
                       <div
                         aria-hidden
                         style={{
@@ -285,7 +348,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                           style={{
                             position: "absolute",
                             inset: 0,
-                            borderRadius: "14px",
+                            borderRadius: 14,
                             boxShadow: "inset 0 0 0 2.5px rgba(255,255,255,0.65)",
                           }}
                         />
@@ -299,7 +362,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: "12px",
+                          fontSize: 12,
                           fontWeight: 500,
                           color: "rgba(255,255,255,0.3)",
                         }}
@@ -311,7 +374,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                 </motion.div>
               )
             })}
-          </div>
+          </motion.div>
         </LayoutGroup>
       </div>
     </motion.div>
@@ -340,7 +403,6 @@ function ImageCollage({ project, onClose }: ImageCollageProps) {
             onClick={onClose}
             aria-hidden
           />
-          {/* key={project.slug} remounts the grid per project, auto-resetting all state */}
           <ImageCollageGrid key={project.slug} project={project} onClose={onClose} />
         </>
       )}
