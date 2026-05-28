@@ -4,14 +4,25 @@ import { useEffect, useRef, useState } from "react"
 
 import { type Project } from "@/content/projects"
 
-// ------- constants -------
-
-const COLS = 3
+// ---- per-image config ----
 
 /**
- * Deterministic per-image spring + rotation values — gives each image
- * a different "personality" so the entrance feels bubbly, not uniform.
+ * Mix of landscape, portrait and square to simulate a real photo upload.
+ * When real images are wired up, replace aspect ratios with the image's
+ * natural intrinsic ratio.
  */
+const IMAGE_RATIOS = [
+  "16/9",
+  "2/3",
+  "1/1",
+  "4/3",
+  "1/1",
+  "3/4",
+  "16/9",
+  "1/1",
+  "2/3",
+] as const
+
 const ENTRANCE = [
   { delay: 0.05, stiffness: 340, damping: 14, rotate: -3 },
   { delay: 0.14, stiffness: 280, damping: 12, rotate: 4 },
@@ -24,30 +35,25 @@ const ENTRANCE = [
   { delay: 0.11, stiffness: 360, damping: 11, rotate: -3 },
 ] as const
 
-// Elastic easing so grid-track changes feel springy
-const TRACK_EASE = "cubic-bezier(0.34, 1.56, 0.64, 1)"
-const TRACK_TRANSITION = `grid-template-columns 0.5s ${TRACK_EASE}, grid-template-rows 0.5s ${TRACK_EASE}`
+// ---- interaction helpers ----
 
-// ------- helpers -------
-
-/**
- * Returns a `Xfr Xfr Xfr` string for the col/row grid tracks.
- * Total always sums to 3fr so the container never changes size.
- *   Hover:    active 1.5fr  | others 0.75fr
- *   Selected: active 2.4fr  | others 0.30fr
- */
-function getTrack(
-  activeIdx: number | null,
-  axis: "col" | "row",
-  isSelected: boolean,
-): string {
-  if (activeIdx === null) return "1fr 1fr 1fr"
-  const track = axis === "col" ? activeIdx % COLS : Math.floor(activeIdx / COLS)
-  const [big, small] = isSelected ? [2.4, 0.3] : [1.5, 0.75]
-  return [0, 1, 2].map((i) => (i === track ? `${big}fr` : `${small}fr`)).join(" ")
+function getScale(
+  i: number,
+  hoveredIdx: number | null,
+  selectedIdx: number | null,
+): number {
+  if (selectedIdx === i) return 1.08
+  if (selectedIdx !== null) return 0.91
+  if (hoveredIdx === i) return 1.07
+  if (hoveredIdx !== null) return 0.95
+  return 1
 }
 
-/** Nine gradient variations derived from the project's colour palette. */
+function getOpacity(i: number, selectedIdx: number | null): number {
+  if (selectedIdx === null || selectedIdx === i) return 1
+  return 0.55
+}
+
 function getGradients({ from, via, to }: Project["gradient"]): string[] {
   return [
     `linear-gradient(135deg, ${from} 0%, ${via} 100%)`,
@@ -62,7 +68,7 @@ function getGradients({ from, via, to }: Project["gradient"]): string[] {
   ]
 }
 
-// ------- inner grid (remounts per project, so state auto-resets) -------
+// ---- inner component (remounts per project so state auto-resets) ----
 
 type GridProps = {
   project: Project
@@ -84,7 +90,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
     }
   }, [])
 
-  // Keyboard: Escape deselects first, then closes the overlay
+  // Escape: deselect first, then close
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return
@@ -95,13 +101,10 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
     return () => document.removeEventListener("keydown", handleKey)
   }, [selectedIdx, onClose])
 
-  const isSelected = selectedIdx !== null
-  const activeIdx = isSelected ? selectedIdx : hoveredIdx
   const gradients = getGradients(project.gradient)
 
   return (
     <motion.div
-      key="collage-content"
       initial={{ opacity: 0, scale: 0.94 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.94 }}
@@ -120,29 +123,43 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
         </button>
       </div>
 
-      {/* CSS Grid accordion */}
+      {/*
+       * CSS columns masonry — images fill columns naturally in their own
+       * aspect ratio so landscape/portrait/square all coexist without distortion.
+       */}
       <div
-        className="pointer-events-auto overflow-hidden rounded-2xl"
-        style={{
-          display: "grid",
-          gridTemplateColumns: getTrack(activeIdx, "col", isSelected),
-          gridTemplateRows: getTrack(activeIdx, "row", isSelected),
-          gap: "8px",
-          width: "min(80vw, 640px)",
-          height: "min(68vh, 560px)",
-          transition: TRACK_TRANSITION,
-        }}
+        className="pointer-events-auto"
+        style={{ columnCount: 3, columnGap: "8px", width: "min(80vw, 680px)" }}
       >
         {gradients.map((bg, i) => {
           const cfg = ENTRANCE[i]
           const isThisSelected = selectedIdx === i
+          const scale = getScale(i, hoveredIdx, selectedIdx)
+          const opacity = getOpacity(i, selectedIdx)
 
           return (
-            <div
+            /*
+             * Outer motion.div — owns the hover/click scale + opacity.
+             * breakInside: avoid keeps each image from splitting across columns.
+             */
+            <motion.div
               key={i}
-              className="relative"
+              animate={{ scale, opacity }}
+              transition={{ type: "spring", stiffness: 380, damping: 32 }}
+              style={{
+                aspectRatio: IMAGE_RATIOS[i],
+                breakInside: "avoid",
+                marginBottom: "8px",
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: "14px",
+                cursor: "pointer",
+                background: bg,
+                // Local z-index so hovered/selected image sits on top of neighbours
+                zIndex: isThisSelected || hoveredIdx === i ? 2 : 1,
+              }}
               onMouseEnter={() => {
-                if (!isSelected) setHoveredIdx(i)
+                if (selectedIdx === null) setHoveredIdx(i)
               }}
               onMouseLeave={() => setHoveredIdx(null)}
               onClick={(e) => {
@@ -151,6 +168,11 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                 setHoveredIdx(null)
               }}
             >
+              {/*
+               * Inner motion.div — owns the one-time bubbly entrance animation.
+               * Keeping entrance and interaction on separate layers means the
+               * hover spring never inherits the entrance delay.
+               */}
               <motion.div
                 initial={{ scale: 0.55, opacity: 0, rotate: cfg.rotate }}
                 animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -160,14 +182,14 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                   stiffness: cfg.stiffness,
                   damping: cfg.damping,
                 }}
-                className="h-full w-full cursor-pointer overflow-hidden rounded-xl"
-                style={{ background: bg }}
+                style={{ position: "absolute", inset: 0, background: bg }}
               >
-                {/* Subtle grid pattern */}
+                {/* Subtle grid texture */}
                 <div
                   aria-hidden
-                  className="absolute inset-0"
                   style={{
+                    position: "absolute",
+                    inset: 0,
                     backgroundImage:
                       "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
                     backgroundSize: "32px 32px",
@@ -176,15 +198,34 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
 
                 {/* Selected ring */}
                 {isThisSelected && (
-                  <div className="absolute inset-0 rounded-xl ring-2 ring-inset ring-white/60" />
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      borderRadius: "14px",
+                      boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.65)",
+                    }}
+                  />
                 )}
 
-                {/* Placeholder label */}
-                <span className="absolute inset-0 flex items-center justify-center text-[12px] font-medium text-white/30">
+                {/* Placeholder number */}
+                <span
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    color: "rgba(255,255,255,0.3)",
+                  }}
+                >
                   {i + 1}
                 </span>
               </motion.div>
-            </div>
+            </motion.div>
           )
         })}
       </div>
@@ -192,7 +233,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
   )
 }
 
-// ------- outer shell (manages AnimatePresence) -------
+// ---- outer shell ----
 
 type ImageCollageProps = {
   project: Project | null
@@ -204,7 +245,7 @@ function ImageCollage({ project, onClose }: ImageCollageProps) {
     <AnimatePresence>
       {project && (
         <>
-          {/* Backdrop — click to close */}
+          {/* Backdrop */}
           <motion.div
             key="collage-backdrop"
             initial={{ opacity: 0 }}
@@ -216,16 +257,8 @@ function ImageCollage({ project, onClose }: ImageCollageProps) {
             aria-hidden
           />
 
-          {/*
-           * key={project.slug} causes React to fully remount ImageCollageGrid
-           * whenever the active project changes — state resets for free,
-           * no setState-in-effect needed.
-           */}
-          <ImageCollageGrid
-            key={project.slug}
-            project={project}
-            onClose={onClose}
-          />
+          {/* key={project.slug} remounts the grid so state auto-resets per project */}
+          <ImageCollageGrid key={project.slug} project={project} onClose={onClose} />
         </>
       )}
     </AnimatePresence>
