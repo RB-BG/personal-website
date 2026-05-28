@@ -245,7 +245,8 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       <div
         className="pointer-events-auto"
         style={{
-          width: "min(90vw, 860px)",
+          width: "100%",
+          maxWidth: 860,
           maxHeight: "calc(100vh - 180px)",
           overflowY: "auto",
           scrollbarWidth: "none",
@@ -255,7 +256,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
          * Inner div: measured for layout width, padded so the 1.10× hover
          * scale on edge images doesn't hit the container boundary.
          */}
-        <div ref={containerRef} style={{ padding: "12px 14px" }}>
+        <div ref={containerRef} style={{ padding: "12px 20px" }}>
         <LayoutGroup>
           {/* Absolutely-positioned masonry — height driven by computed layout */}
           <motion.div
