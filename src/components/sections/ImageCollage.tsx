@@ -6,8 +6,8 @@ import { type Project } from "@/content/projects"
 
 // ---- constants ----
 
-const TARGET_ROW_H = 220  // px — base row height before row-fill scaling
-const GAP = 8             // px — gap between images
+const NUM_COLS = 3
+const GAP = 8  // px — gap between images
 
 /**
  * Placeholder images: numeric aspect ratios (width / height).
@@ -39,7 +39,7 @@ const ENTRANCE = [
   { delay: 0.11, stiffness: 360, damping: 11, rotate: -3 },
 ] as const
 
-// ---- justified layout algorithm ----
+// ---- masonry layout algorithm ----
 
 interface LayoutItem {
   x: number
@@ -49,79 +49,53 @@ interface LayoutItem {
 }
 
 /**
- * Packs images into rows such that each row fills `containerW` exactly,
- * with every image at the same visual row height.
+ * Pinterest-style masonry: fixed-width columns, variable heights.
+ * Each image is placed in the currently-shortest column.
  *
- * When `selectedIdx` is set, that image gets 2× target height, making it
- * larger and changing which images land in the same row.
- *
- * Last row: scaled to fill only if it's ≥ 60 % full; otherwise left-aligned
- * to avoid grotesquely stretched single images.
+ * When `selectedIdx` is set, that image spans 2 adjacent columns
+ * (choosing the pair whose taller column is lowest), making it
+ * expand prominently while surrounding images continue filling
+ * the remaining column without leaving empty gaps.
  */
 function computeLayout(
   ratios: number[],
   containerW: number,
   selectedIdx: number | null,
+  numCols = NUM_COLS,
 ): { items: LayoutItem[]; totalH: number } {
   if (containerW === 0) return { items: ratios.map(() => ({ x: 0, y: 0, w: 0, h: 0 })), totalH: 0 }
 
-  // Effective target height per image (selected = 2×)
-  const effH = ratios.map((_, i) =>
-    i === selectedIdx ? TARGET_ROW_H * 2 : TARGET_ROW_H,
-  )
-  // Preferred width at effective height
-  const prefW = ratios.map((r, i) => r * effH[i])
-
-  // Pack indices into rows
-  const rows: number[][] = []
-  let row: number[] = []
-  let rowW = 0
+  const colW = (containerW - GAP * (numCols - 1)) / numCols
+  // colH tracks the next available Y in each column (cumulative height + gaps)
+  const colH = Array<number>(numCols).fill(0)
+  const items: LayoutItem[] = Array(ratios.length)
 
   for (let i = 0; i < ratios.length; i++) {
-    const extra = row.length > 0 ? GAP + prefW[i] : prefW[i]
-    if (row.length > 0 && rowW + extra > containerW) {
-      rows.push([...row])
-      row = [i]
-      rowW = prefW[i]
+    const span = i === selectedIdx ? 2 : 1
+    const w = span === 1 ? colW : colW * 2 + GAP
+    const h = w / ratios[i]
+
+    let col = 0
+    if (span === 1) {
+      col = colH.indexOf(Math.min(...colH))
     } else {
-      row.push(i)
-      rowW += extra
-    }
-  }
-  if (row.length > 0) rows.push(row)
-
-  const items: LayoutItem[] = Array(ratios.length)
-  let y = 0
-
-  for (let r = 0; r < rows.length; r++) {
-    const indices = rows[r]
-    const isLast = r === rows.length - 1
-    const totalPref = indices.reduce((s, i) => s + prefW[i], 0)
-    const gaps = (indices.length - 1) * GAP
-    const naturalW = totalPref + gaps
-
-    // Scale to fill container width — unless it's the last row and it's sparse
-    const scale =
-      isLast && naturalW < containerW * 0.6
-        ? 1
-        : (containerW - gaps) / totalPref
-
-    // Row height is the tallest scaled image in this row
-    const rowH = Math.max(...indices.map((i) => effH[i] * scale))
-
-    let x = 0
-    for (const i of indices) {
-      const w = prefW[i] * scale
-      const h = effH[i] * scale
-      // Vertically centre shorter images (e.g. regular next to 2× selected)
-      items[i] = { x, y: y + (rowH - h) / 2, w, h }
-      x += w + GAP
+      // Pick adjacent pair whose taller column is shortest
+      let minH = Infinity
+      for (let c = 0; c <= numCols - 2; c++) {
+        const pairH = Math.max(colH[c], colH[c + 1])
+        if (pairH < minH) { minH = pairH; col = c }
+      }
     }
 
-    y += rowH + GAP
+    const y = span === 1 ? colH[col] : Math.max(colH[col], colH[col + 1])
+    items[i] = { x: col * (colW + GAP), y, w, h }
+
+    const next = y + h + GAP
+    colH[col] = next
+    if (span === 2) colH[col + 1] = next
   }
 
-  return { items, totalH: Math.max(0, y - GAP) }
+  return { items, totalH: Math.max(...colH) - GAP }
 }
 
 // ---- gradient helpers ----
@@ -250,7 +224,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       </div>
 
       {/*
-       * Scrollable grid container.
+       * Scrollable masonry container.
        * scrollbar-width: none hides the scrollbar while keeping it functional.
        */}
       <div
@@ -264,7 +238,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
         }}
       >
         <LayoutGroup>
-          {/* Absolutely-positioned grid — height driven by computed layout */}
+          {/* Absolutely-positioned masonry — height driven by computed layout */}
           <motion.div
             layout
             style={{ position: "relative", height: layout.totalH }}
@@ -276,9 +250,9 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
 
               return (
                 /*
-                 * Layout layer — absolute position set by the justified
-                 * algorithm. framer-motion FLIP animates from old → new
-                 * bounding box whenever layout recomputes (selectedIdx change).
+                 * Layout layer — absolute position set by the masonry algorithm.
+                 * framer-motion FLIP animates from old → new bounding box on
+                 * selectedIdx change (single-col → two-col span and back).
                  */
                 <motion.div
                   key={i}
