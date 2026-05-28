@@ -29,6 +29,8 @@ export type Project = {
   imgLeft: boolean
   /** Placeholder href — will become a route in Phase 3. */
   href: string
+  /** Optional real screenshot. Path relative to /public (e.g. "/images/berp-dashboard.png"). */
+  screenshot?: string
   /** Expanded case study content shown in the slide-in drawer. */
   caseStudy: CaseStudy
 }
@@ -48,6 +50,7 @@ export const projects: ReadonlyArray<Project> = [
     bgClass: "bg-stone-50",
     imgLeft: true,
     href: "#",
+    screenshot: "/images/BrandDashboard.png",
     caseStudy: {
       intro:
         "When I joined Brand Boekhouders in early 2025, a 20-person bookkeeping firm had outgrown its tooling. Critical workflows ran across Excel sheets, disconnected SaaS subscriptions, and email threads — with no single source of truth and no audit trail. My mandate was to fix that from the ground up.",

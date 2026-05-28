@@ -27,6 +27,7 @@ function ProjectSection({ project, onOpenCaseStudy, onOpenGallery }: ProjectSect
     blobColor,
     bgClass,
     imgLeft,
+    screenshot,
   } = project
 
   const eyebrow = `${company.toUpperCase()} · ${period.toUpperCase()}`
@@ -53,7 +54,7 @@ function ProjectSection({ project, onOpenCaseStudy, onOpenGallery }: ProjectSect
       </ParallaxShape>
 
       <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-20 lg:grid-cols-[1.1fr_1fr]">
-        {imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft onOpenGallery={onOpenGallery} />}
+        {imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft screenshot={screenshot} onOpenGallery={onOpenGallery} />}
 
         <FadeIn y={20}>
           <p
@@ -102,7 +103,7 @@ function ProjectSection({ project, onOpenCaseStudy, onOpenGallery }: ProjectSect
           </button>
         </FadeIn>
 
-        {!imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft={false} onOpenGallery={onOpenGallery} />}
+        {!imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft={false} screenshot={screenshot} onOpenGallery={onOpenGallery} />}
       </div>
     </section>
   )
@@ -112,10 +113,11 @@ type ProjectImageProps = {
   gradient: Project["gradient"]
   badge?: string
   imgLeft: boolean
+  screenshot?: string
   onOpenGallery: () => void
 }
 
-function ProjectImage({ gradient, badge, imgLeft, onOpenGallery }: ProjectImageProps) {
+function ProjectImage({ gradient, badge, imgLeft, screenshot, onOpenGallery }: ProjectImageProps) {
   return (
     <motion.div
       whileHover={{ scale: 1.015, y: -8 }}
@@ -127,35 +129,75 @@ function ProjectImage({ gradient, badge, imgLeft, onOpenGallery }: ProjectImageP
       }}
       onClick={onOpenGallery}
     >
-      {/* grid overlay */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-      {/* ghost ring inside card */}
-      <div
-        aria-hidden
-        className={cn(
-          "absolute -top-15 size-60 rounded-full border border-white/10",
-          imgLeft ? "-right-15" : "-left-15",
-        )}
-      />
+      {screenshot ? (
+        <>
+          <img
+            src={screenshot}
+            alt="Project screenshot"
+            className="absolute inset-0 h-full w-full object-cover"
+            onError={(e) => { e.currentTarget.style.display = "none" }}
+          />
+          {/* Gradient overlay — fades in on hover */}
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-80"
+            style={{
+              background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.via} 55%, ${gradient.to} 100%)`,
+            }}
+          />
+          {/* Grid texture on top of gradient */}
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+          {/* Ghost ring */}
+          <div
+            aria-hidden
+            className={cn(
+              "absolute -top-15 size-60 rounded-full border border-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100",
+              imgLeft ? "-right-15" : "-left-15",
+            )}
+          />
+        </>
+      ) : (
+        <>
+          {/* grid overlay */}
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+          {/* ghost ring inside card */}
+          <div
+            aria-hidden
+            className={cn(
+              "absolute -top-15 size-60 rounded-full border border-white/10",
+              imgLeft ? "-right-15" : "-left-15",
+            )}
+          />
+          <span className="absolute inset-0 flex items-center justify-center text-center text-[15px] font-medium text-white/40">
+            Screenshot
+            <br />
+            placeholder
+          </span>
+        </>
+      )}
+
       {badge && (
         <span className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[12px] font-semibold tracking-[0.1em] text-white uppercase backdrop-blur-sm">
           <span className="size-1.5 rounded-full bg-brand-400" />
           {badge}
         </span>
       )}
-      <span className="absolute inset-0 flex items-center justify-center text-center text-[15px] font-medium text-white/40">
-        Screenshot
-        <br />
-        placeholder
-      </span>
 
       {/* Gallery hint — fades in on hover */}
       <div className="absolute inset-x-0 bottom-0 flex justify-center pb-5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
