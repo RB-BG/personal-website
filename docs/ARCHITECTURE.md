@@ -38,7 +38,8 @@ The codebase splits components into four layers based on responsibility. Lower l
 ```
 pages/        Homepage
    ▲
-sections/     Hero, LogoMarquee, WorkIntro, ProjectSection, Experience, Contact
+sections/     Hero, LogoMarquee, WorkIntro, ProjectSection, Experience, Contact,
+              CaseStudyDrawer, ImageCollage
    ▲
 ui/           Button, Badge        (interactive primitives)
 decorative/   GradientBlob, GhostRing, DotGrid    (pure visuals)
@@ -106,6 +107,54 @@ This pattern means all four projects share one component. To add a fifth project
 
 `Experience.tsx` follows the same pattern with `content/experience.ts` and the `ExperienceCard` internal component.
 
+## Overlay pattern: CaseStudyDrawer and ImageCollage
+
+Both overlays follow the same structural pattern:
+
+```
+AnimatePresence
+  motion.div (backdrop, z-[55]) — dark blurred overlay, closes on click
+  <Inner> (panel/grid, z-[60]) — the actual content
+```
+
+The z-indices are deliberately above the sticky header (`z-50`) so the header disappears when an overlay opens. The backdrop at `z-[55]` sits between the header and the panel at `z-[60]`.
+
+**State lives in `Homepage.tsx`.** Two independent slugs (`activeSlug` for the drawer, `gallerySlug` for the collage) control which project is open. Passing `null` closes the overlay. `AnimatePresence` handles the enter/exit animation.
+
+**`CaseStudyDrawer`** slides in from the same side as the project image (`imgLeft ? "left-0" : "right-0"`) via `initial={{ x: project.imgLeft ? "-100%" : "100%" }}`. Content is sourced from the `caseStudy` field in `projects.ts`.
+
+**`ImageCollage`** uses `key={project.slug}` on the inner `ImageCollageGrid` so the component fully remounts (resetting all state) each time a different project's gallery is opened.
+
+## Masonry layout algorithm
+
+`ImageCollage.tsx` implements a Pinterest-style masonry layout in `computeLayout()`. It runs in JavaScript rather than CSS because framer-motion needs explicit pixel positions for FLIP animation.
+
+**Normal state:** images fill three equal-width columns. Each image is placed in the currently-shortest column (`colH.indexOf(Math.min(...colH))`). Height is derived from the image's aspect ratio: `h = colWidth / ratio`.
+
+**Selected state:** clicking an image sets `selectedIdx`. That image spans 2 adjacent columns (the pair whose taller column is currently lowest). Width doubles to `colW * 2 + GAP`, height recalculates proportionally. framer-motion's `layout` prop FLIP-animates every image from its old bounding box to its new one.
+
+### Three-layer motion structure per image tile
+
+Each tile uses three nested `motion.div` elements to keep concerns isolated:
+
+```
+motion.div  layout (FLIP)        — absolute-positioned by masonry algorithm, animates on selection change
+  motion.div  wave scale         — animates scale: [0.9..1.06], overflow: hidden, clips content
+    motion.div  entrance         — one-time spring on mount (scale 0.55→1, rotate→0, staggered delay)
+      {grid texture, selected ring, placeholder number}
+    div  hover caption overlay   — direct child of wave scale, NOT inside entrance layer
+```
+
+The caption overlay must be a direct child of the `overflow: hidden` wave scale layer, not nested inside the entrance animation layer. Putting it inside a transformed element breaks `overflow: hidden` clipping in Safari.
+
+### Hover wave effect
+
+`handleMouseEnter` uses `getBoundingClientRect()` to compute pixel distance from the hovered image centre to every other image centre. Scale for each image is: `1 - 0.10 * Math.exp(-dist / 280)`. The hovered image itself gets `1.06`. This gives a subtle ripple that falls off naturally with distance, regardless of masonry column position.
+
+### Edge-clipping prevention
+
+`overflow-y: auto` on the scroll container implicitly clips `overflow-x` too (CSS spec). The inner `containerRef` div therefore has `padding: "12px 20px"`. The `ResizeObserver` reads `contentRect.width` (content box, after padding), so the masonry algorithm computes against the narrower inner width. At `1.06` scale on `~265px` columns, the maximum edge expansion is about 13px. The 20px padding gives a comfortable 7px spare.
+
 ## CSS-only marquee
 
 The logo marquee uses framer-motion nowhere. A pure CSS keyframe animates a `translateX(0)` to `translateX(-50%)` loop on a row that duplicates the company list. The `.group:hover .marquee-track { animation-play-state: paused }` rule pauses on hover. Reduced motion disables the animation.
@@ -117,4 +166,5 @@ We chose this over framer-motion because the marquee runs continuously (no scrol
 - **The Lucide brand-icon problem.** Lucide 1.x dropped `Github`, `Linkedin` (and other trademarked icons). The Contact section inlines those two SVGs locally. Do not try to re-import them from `lucide-react`.
 - **`react-refresh/only-export-components` is suppressed on the two `ui/*` files** (`Button` and `Badge`) because they export both the component and its `*Variants` CVA function, which the rule does not allow. This matches the shadcn convention. If you add more `ui/*` components with the same pattern, add the disable comment.
 - **No `dangerouslySetInnerHTML` workaround for typography.** Project titles and bodies use it only to allow HTML entities (`&mdash;`, `<strong>`) inside content data without React escaping them. If we later need richer formatting, switch to a markdown parser or compose React children in the content file.
-- **No routing yet.** Case-study links are `<a href="#" aria-disabled>` placeholders. Phase 3 adds `react-router-dom` + `/work/[slug]` pages. The `href` field on each project in `projects.ts` is ready to receive the real path.
+- **No routing yet.** The case study drawer is a slide-in panel, not a real route. Phase 3 adds `react-router-dom` + `/work/[slug]` pages. The `href` field on each project in `projects.ts` is ready to receive the real path.
+- **`IMAGE_RATIOS` and `IMAGE_CAPTIONS` in `ImageCollage.tsx`** are placeholders. When real screenshots are available, update both arrays with the actual aspect ratios (width/height) and captions per image. The masonry layout recalculates automatically.

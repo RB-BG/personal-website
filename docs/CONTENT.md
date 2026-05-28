@@ -15,12 +15,23 @@ Open `src/content/projects.ts`. Each project is an object in the `projects` arra
   title: "Headline that describes the work.",        // h3 in the section
   body: "One paragraph of context. HTML entities like &mdash; and <strong>...</strong> work here.",
   tags: ["Tag 1", "Tag 2", "Tag 3"],                 // first tag gets the brand gradient, rest are neutral
-  gradient: { from: "#hex", via: "#hex", to: "#hex" },  // image placeholder gradient
+  gradient: { from: "#hex", via: "#hex", to: "#hex" },  // image placeholder + drawer header gradient
   accentClass: "text-brand-600",                     // eyebrow + link text colour (Tailwind class)
   blobColor: "#7c3aed",                              // hex used for the decorative parallax blob behind the section
   bgClass: "bg-stone-50",                            // section background colour (Tailwind class)
-  imgLeft: true,                                     // true = image left, false = image right (alternate per project)
-  href: "#",                                         // case-study link, will become "/work/my-new-project" in Phase 3
+  imgLeft: true,                                     // true = image left, false = image right (also controls drawer slide direction)
+  href: "#",                                         // will become "/work/my-new-project" in Phase 3
+  caseStudy: {
+    intro: "One paragraph that opens the drawer.",
+    sections: [
+      { heading: "Section heading", body: "One or two paragraphs." },
+      // add more sections as needed
+    ],
+    outcomes: [
+      "One concrete result per bullet",
+      // aim for 3 to 5 outcomes
+    ],
+  },
 }
 ```
 
@@ -30,6 +41,35 @@ Open `src/content/projects.ts`. Each project is an object in the `projects` arra
 - Pick `accentClass` and `blobColor` from the same colour family (e.g. `text-sky-500` with `#0284c7`).
 - Keep `body` to two or three sentences. Long copy breaks the rhythm.
 - The first tag should be the project's defining role or domain. It gets visual emphasis through the brand-gradient background.
+
+## Editing the image gallery (ImageCollage)
+
+Each project has a gallery overlay. The images are currently placeholders. Two constants at the top of `src/components/sections/ImageCollage.tsx` control them:
+
+```ts
+// Aspect ratios (width / height) — one entry per image
+const IMAGE_RATIOS = [
+  16 / 9,  // landscape
+   2 / 3,  // portrait
+   1 / 1,  // square
+  // ...
+]
+
+// Caption shown on hover (one entry per image, same order as ratios)
+const IMAGE_CAPTIONS = [
+  "Product strategy overview",
+  "Team collaboration session",
+  // ...
+]
+```
+
+To replace placeholders with real images:
+1. Add the actual images to the `public/` folder or import them as modules.
+2. Update `IMAGE_RATIOS` with the real aspect ratio of each image (`width / height`).
+3. Update `IMAGE_CAPTIONS` with the real caption for each image.
+4. Replace the gradient `<div>` inside the entrance animation layer with an `<img>` element.
+
+The masonry layout recalculates from the ratios automatically. Portrait images become taller, landscape images shorter, filling columns proportionally.
 
 ## Editing an education or extra-curricular card
 
