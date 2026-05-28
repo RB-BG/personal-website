@@ -52,7 +52,7 @@ function CaseStudyDrawer({ project, onClose }: CaseStudyDrawerProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.35 }}
             className="fixed inset-0 z-40 bg-stone-950/40 backdrop-blur-sm"
             onClick={onClose}
             aria-hidden
@@ -64,7 +64,7 @@ function CaseStudyDrawer({ project, onClose }: CaseStudyDrawerProps) {
             initial={{ x: project.imgLeft ? "-100%" : "100%" }}
             animate={{ x: 0 }}
             exit={{ x: project.imgLeft ? "-100%" : "100%" }}
-            transition={{ type: "spring", stiffness: 360, damping: 42, mass: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 36, mass: 1 }}
             className={cn(
               "fixed top-0 bottom-0 z-50 flex w-full max-w-[680px] flex-col bg-white shadow-2xl",
               project.imgLeft ? "left-0" : "right-0",
