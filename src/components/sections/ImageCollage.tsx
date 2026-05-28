@@ -209,7 +209,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.94 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      className="pointer-events-none fixed inset-0 z-50 flex flex-col items-center justify-center px-8 py-12"
+      className="pointer-events-none fixed inset-0 z-[60] flex flex-col items-center justify-center px-8 py-12"
     >
       {/* Back button */}
       <div className="pointer-events-auto mb-5 w-full max-w-[680px]">
@@ -380,7 +380,7 @@ function ImageCollage({ project, onClose }: ImageCollageProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-stone-950/70 backdrop-blur-md"
+            className="fixed inset-0 z-[55] bg-stone-950/70 backdrop-blur-md"
             onClick={onClose}
             aria-hidden
           />
