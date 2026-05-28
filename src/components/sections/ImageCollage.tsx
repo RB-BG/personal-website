@@ -1,58 +1,59 @@
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion"
 import { ArrowLeft } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { type Project } from "@/content/projects"
 
-// ---- per-image config ----
+// ---- image config ----
+
+type ImgType = "landscape" | "portrait" | "square"
 
 /**
- * Mix of landscape, portrait and square to simulate a real photo upload.
- * When real images are wired up, replace aspect ratios with the image's
- * natural intrinsic ratio.
+ * Pre-defined aspect ratios for the placeholder grid.
+ * When real images are wired up, swap each ratio for the image's
+ * intrinsic width/height ratio.
  */
-const IMAGE_RATIOS = [
-  "16/9",
-  "2/3",
-  "1/1",
-  "4/3",
-  "1/1",
-  "3/4",
-  "16/9",
-  "1/1",
-  "2/3",
-] as const
+const IMAGES: ReadonlyArray<{ type: ImgType; ratio: string }> = [
+  { type: "landscape", ratio: "16/9" },
+  { type: "portrait",  ratio: "2/3"  },
+  { type: "square",    ratio: "1/1"  },
+  { type: "landscape", ratio: "4/3"  },
+  { type: "square",    ratio: "1/1"  },
+  { type: "portrait",  ratio: "3/4"  },
+  { type: "landscape", ratio: "16/9" },
+  { type: "square",    ratio: "1/1"  },
+  { type: "portrait",  ratio: "2/3"  },
+]
+
+/** Columns each image spans in the 3-col grid when at rest. */
+function normalSpan(type: ImgType): number {
+  return type === "landscape" ? 2 : 1
+}
+
+/**
+ * Columns each image spans when selected (clicked).
+ *   landscape → full row (3 cols) — pushes neighbours to next row
+ *   portrait / square → 2 cols — taller at wider width, extends the grid
+ */
+function featuredSpan(type: ImgType): number {
+  return type === "landscape" ? 3 : 2
+}
+
+// ---- entrance animation config ----
 
 const ENTRANCE = [
   { delay: 0.05, stiffness: 340, damping: 14, rotate: -3 },
-  { delay: 0.14, stiffness: 280, damping: 12, rotate: 4 },
+  { delay: 0.14, stiffness: 280, damping: 12, rotate:  4 },
   { delay: 0.08, stiffness: 380, damping: 16, rotate: -2 },
-  { delay: 0.20, stiffness: 300, damping: 13, rotate: 5 },
+  { delay: 0.20, stiffness: 300, damping: 13, rotate:  5 },
   { delay: 0.28, stiffness: 260, damping: 14, rotate: -4 },
-  { delay: 0.16, stiffness: 350, damping: 12, rotate: 3 },
+  { delay: 0.16, stiffness: 350, damping: 12, rotate:  3 },
   { delay: 0.24, stiffness: 290, damping: 15, rotate: -5 },
-  { delay: 0.32, stiffness: 320, damping: 13, rotate: 2 },
+  { delay: 0.32, stiffness: 320, damping: 13, rotate:  2 },
   { delay: 0.11, stiffness: 360, damping: 11, rotate: -3 },
 ] as const
 
-// ---- interaction helpers ----
-
-function getScale(
-  i: number,
-  hoveredIdx: number | null,
-  selectedIdx: number | null,
-): number {
-  if (selectedIdx === i) return 1.08
-  if (selectedIdx !== null) return 0.91
-  if (hoveredIdx === i) return 1.07
-  if (hoveredIdx !== null) return 0.95
-  return 1
-}
-
-function getOpacity(i: number, selectedIdx: number | null): number {
-  if (selectedIdx === null || selectedIdx === i) return 1
-  return 0.55
-}
+// ---- helpers ----
 
 function getGradients({ from, via, to }: Project["gradient"]): string[] {
   return [
@@ -68,17 +69,24 @@ function getGradients({ from, via, to }: Project["gradient"]): string[] {
   ]
 }
 
-// ---- inner component (remounts per project so state auto-resets) ----
+// ---- inner component (remounts per project, auto-resets state) ----
 
-type GridProps = {
-  project: Project
-  onClose: () => void
-}
+type GridProps = { project: Project; onClose: () => void }
 
 function ImageCollageGrid({ project, onClose }: GridProps) {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+  const [scales, setScales] = useState<number[]>(() =>
+    Array(IMAGES.length).fill(1),
+  )
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  /**
+   * One ref per image so we can read their bounding boxes for the wave.
+   * Stored in a ref-of-array to avoid re-renders on assignment.
+   */
+  const itemRefs = useRef<Array<HTMLDivElement | null>>(
+    Array(IMAGES.length).fill(null),
+  )
+  const gradients = getGradients(project.gradient)
 
   // Body scroll lock + initial focus
   useEffect(() => {
@@ -92,16 +100,63 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
 
   // Escape: deselect first, then close
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return
       if (selectedIdx !== null) setSelectedIdx(null)
       else onClose()
     }
-    document.addEventListener("keydown", handleKey)
-    return () => document.removeEventListener("keydown", handleKey)
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
   }, [selectedIdx, onClose])
 
-  const gradients = getGradients(project.gradient)
+  /**
+   * Hover wave.
+   * Measures the pixel distance from the hovered image's centre to every
+   * other image's centre, then applies an exponential decay:
+   *   hovered image  → 1.12  (grows)
+   *   close neighbour → ~0.88 (shrinks most)
+   *   distant image   → ~0.97 (barely moves)
+   */
+  const handleMouseEnter = useCallback(
+    (i: number) => {
+      if (selectedIdx !== null) return
+
+      const el = itemRefs.current[i]
+      if (!el) return
+
+      const { left, top, width, height } = el.getBoundingClientRect()
+      const cx = left + width / 2
+      const cy = top + height / 2
+
+      setScales(
+        itemRefs.current.map((ref, j) => {
+          if (!ref) return 1
+          if (j === i) return 1.12
+          const r = ref.getBoundingClientRect()
+          const dist = Math.hypot(
+            cx - (r.left + r.width / 2),
+            cy - (r.top + r.height / 2),
+          )
+          // Exponential falloff: strong nearby, fades to ~1.0 at 600+ px
+          return 1 - 0.16 * Math.exp(-dist / 280)
+        }),
+      )
+    },
+    [selectedIdx],
+  )
+
+  const handleMouseLeave = useCallback(() => {
+    setScales(Array(IMAGES.length).fill(1))
+  }, [])
+
+  /**
+   * Click to feature / deselect.
+   * Resets hover scales first so the wave doesn't linger during reflow.
+   */
+  const handleClick = useCallback((i: number) => {
+    setScales(Array(IMAGES.length).fill(1))
+    setSelectedIdx((prev) => (prev === i ? null : i))
+  }, [])
 
   return (
     <motion.div
@@ -124,110 +179,140 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       </div>
 
       {/*
-       * CSS columns masonry — images fill columns naturally in their own
-       * aspect ratio so landscape/portrait/square all coexist without distortion.
+       * Scrollable wrapper so a tall featured portrait doesn't overflow
+       * the viewport after the grid expands.
        */}
       <div
         className="pointer-events-auto"
-        style={{ columnCount: 3, columnGap: "8px", width: "min(80vw, 680px)" }}
+        style={{
+          width: "min(80vw, 680px)",
+          maxHeight: "calc(100vh - 180px)",
+          overflowY: "auto",
+        }}
       >
-        {gradients.map((bg, i) => {
-          const cfg = ENTRANCE[i]
-          const isThisSelected = selectedIdx === i
-          const scale = getScale(i, hoveredIdx, selectedIdx)
-          const opacity = getOpacity(i, selectedIdx)
+        <LayoutGroup>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gridAutoFlow: "dense",
+              alignItems: "start",
+              gap: "8px",
+            }}
+          >
+            {IMAGES.map((img, i) => {
+              const isSelected = selectedIdx === i
+              const span = isSelected ? featuredSpan(img.type) : normalSpan(img.type)
+              const cfg = ENTRANCE[i]
 
-          return (
-            /*
-             * Outer motion.div — owns the hover/click scale + opacity.
-             * breakInside: avoid keeps each image from splitting across columns.
-             */
-            <motion.div
-              key={i}
-              animate={{ scale, opacity }}
-              transition={{ type: "spring", stiffness: 380, damping: 32 }}
-              style={{
-                aspectRatio: IMAGE_RATIOS[i],
-                breakInside: "avoid",
-                marginBottom: "8px",
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: "14px",
-                cursor: "pointer",
-                background: bg,
-                // Local z-index so hovered/selected image sits on top of neighbours
-                zIndex: isThisSelected || hoveredIdx === i ? 2 : 1,
-              }}
-              onMouseEnter={() => {
-                if (selectedIdx === null) setHoveredIdx(i)
-              }}
-              onMouseLeave={() => setHoveredIdx(null)}
-              onClick={(e) => {
-                e.stopPropagation()
-                setSelectedIdx(isThisSelected ? null : i)
-                setHoveredIdx(null)
-              }}
-            >
-              {/*
-               * Inner motion.div — owns the one-time bubbly entrance animation.
-               * Keeping entrance and interaction on separate layers means the
-               * hover spring never inherits the entrance delay.
-               */}
-              <motion.div
-                initial={{ scale: 0.55, opacity: 0, rotate: cfg.rotate }}
-                animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                transition={{
-                  delay: cfg.delay,
-                  type: "spring",
-                  stiffness: cfg.stiffness,
-                  damping: cfg.damping,
-                }}
-                style={{ position: "absolute", inset: 0, background: bg }}
-              >
-                {/* Subtle grid texture */}
-                <div
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundImage:
-                      "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-                    backgroundSize: "32px 32px",
+              return (
+                /*
+                 * Layout layer — owns grid positioning and animates reflow
+                 * when gridColumn span changes (click to feature/deselect).
+                 * framer-motion FLIP: captures bounding box before and after
+                 * the DOM update, then plays a spring from old → new.
+                 */
+                <motion.div
+                  key={i}
+                  ref={(el) => {
+                    itemRefs.current[i] = el
                   }}
-                />
-
-                {/* Selected ring */}
-                {isThisSelected && (
-                  <div
-                    aria-hidden
+                  layout
+                  transition={{
+                    layout: { type: "spring", stiffness: 260, damping: 28 },
+                  }}
+                  style={{
+                    gridColumn: `span ${span}`,
+                    aspectRatio: img.ratio,
+                    position: "relative",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={() => handleMouseEnter(i)}
+                  onMouseLeave={handleMouseLeave}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleClick(i)
+                  }}
+                >
+                  {/*
+                   * Wave scale layer — kept separate from the layout layer so
+                   * the two transforms don't compound during simultaneous
+                   * layout + scale animations.
+                   */}
+                  <motion.div
+                    animate={{ scale: scales[i] }}
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
                     style={{
                       position: "absolute",
                       inset: 0,
                       borderRadius: "14px",
-                      boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.65)",
+                      overflow: "hidden",
+                      background: gradients[i],
                     }}
-                  />
-                )}
+                  >
+                    {/*
+                     * Entrance layer — one-time bubbly spring on mount.
+                     * Separated from the wave layer so the entrance delay
+                     * never bleeds into hover transitions.
+                     */}
+                    <motion.div
+                      initial={{ scale: 0.55, opacity: 0, rotate: cfg.rotate }}
+                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                      transition={{
+                        delay: cfg.delay,
+                        type: "spring",
+                        stiffness: cfg.stiffness,
+                        damping: cfg.damping,
+                      }}
+                      style={{ position: "absolute", inset: 0, background: gradients[i] }}
+                    >
+                      {/* Subtle grid texture */}
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          backgroundImage:
+                            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+                          backgroundSize: "32px 32px",
+                        }}
+                      />
 
-                {/* Placeholder number */}
-                <span
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    color: "rgba(255,255,255,0.3)",
-                  }}
-                >
-                  {i + 1}
-                </span>
-              </motion.div>
-            </motion.div>
-          )
-        })}
+                      {/* Selected ring */}
+                      {isSelected && (
+                        <div
+                          aria-hidden
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            borderRadius: "14px",
+                            boxShadow: "inset 0 0 0 2.5px rgba(255,255,255,0.65)",
+                          }}
+                        />
+                      )}
+
+                      {/* Placeholder number */}
+                      <span
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                          fontWeight: 500,
+                          color: "rgba(255,255,255,0.3)",
+                        }}
+                      >
+                        {i + 1}
+                      </span>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </LayoutGroup>
       </div>
     </motion.div>
   )
@@ -245,7 +330,6 @@ function ImageCollage({ project, onClose }: ImageCollageProps) {
     <AnimatePresence>
       {project && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="collage-backdrop"
             initial={{ opacity: 0 }}
@@ -256,8 +340,7 @@ function ImageCollage({ project, onClose }: ImageCollageProps) {
             onClick={onClose}
             aria-hidden
           />
-
-          {/* key={project.slug} remounts the grid so state auto-resets per project */}
+          {/* key={project.slug} remounts the grid per project, auto-resetting all state */}
           <ImageCollageGrid key={project.slug} project={project} onClose={onClose} />
         </>
       )}
