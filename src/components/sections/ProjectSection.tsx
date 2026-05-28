@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils"
 
 type ProjectSectionProps = {
   project: Project
+  onOpenCaseStudy: () => void
 }
 
-function ProjectSection({ project }: ProjectSectionProps) {
+function ProjectSection({ project, onOpenCaseStudy }: ProjectSectionProps) {
   const {
     company,
     period,
@@ -25,7 +26,6 @@ function ProjectSection({ project }: ProjectSectionProps) {
     blobColor,
     bgClass,
     imgLeft,
-    href,
   } = project
 
   const eyebrow = `${company.toUpperCase()} · ${period.toUpperCase()}`
@@ -86,11 +86,10 @@ function ProjectSection({ project }: ProjectSectionProps) {
               </span>
             ))}
           </div>
-          <a
-            href={href}
-            aria-disabled
+          <button
+            onClick={onOpenCaseStudy}
             className={cn(
-              "group inline-flex items-center gap-2.5 text-base font-semibold",
+              "group inline-flex items-center gap-2.5 text-base font-semibold transition-opacity hover:opacity-75",
               accentClass,
             )}
           >
@@ -99,7 +98,7 @@ function ProjectSection({ project }: ProjectSectionProps) {
               className="size-[18px] transition-transform group-hover:translate-x-1"
               strokeWidth={2.5}
             />
-          </a>
+          </button>
         </FadeIn>
 
         {!imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft={false} />}
