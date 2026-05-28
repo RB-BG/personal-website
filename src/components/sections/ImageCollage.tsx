@@ -145,7 +145,16 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
   )
 
   const gradients = getGradients(project.gradient)
-  const layout = computeLayout(IMAGE_RATIOS, containerW, selectedIdx)
+
+  // Merge real gallery images into placeholder slots (real images fill from index 0)
+  const resolvedRatios = IMAGE_RATIOS.map((placeholder, i) =>
+    project.galleryImages?.[i]?.ratio ?? placeholder,
+  )
+  const resolvedCaptions = IMAGE_CAPTIONS.map((placeholder, i) =>
+    project.galleryImages?.[i]?.caption ?? placeholder,
+  )
+
+  const layout = computeLayout(resolvedRatios, containerW, selectedIdx)
 
   // Measure container width (responsive)
   useEffect(() => {
@@ -265,10 +274,11 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                 layout
                 style={{ position: "relative", height: layout.totalH }}
               >
-                {IMAGE_RATIOS.map((_, i) => {
+                {resolvedRatios.map((_, i) => {
                   const item = layout.items[i]
                   const cfg = ENTRANCE[i]
                   const isSelected = selectedIdx === i
+                  const realImage = project.galleryImages?.[i]
 
                   return (
                     /*
@@ -326,17 +336,42 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                           }}
                           style={{ position: "absolute", inset: 0, background: gradients[i] }}
                         >
-                          {/* Grid texture */}
-                          <div
-                            aria-hidden
-                            style={{
-                              position: "absolute",
-                              inset: 0,
-                              backgroundImage:
-                                "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-                              backgroundSize: "32px 32px",
-                            }}
-                          />
+                          {realImage ? (
+                            <img
+                              src={realImage.src}
+                              alt={realImage.caption}
+                              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                            />
+                          ) : (
+                            <>
+                              {/* Grid texture */}
+                              <div
+                                aria-hidden
+                                style={{
+                                  position: "absolute",
+                                  inset: 0,
+                                  backgroundImage:
+                                    "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+                                  backgroundSize: "32px 32px",
+                                }}
+                              />
+                              {/* Placeholder number */}
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  inset: 0,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: 12,
+                                  fontWeight: 500,
+                                  color: "rgba(255,255,255,0.3)",
+                                }}
+                              >
+                                {i + 1}
+                              </span>
+                            </>
+                          )}
 
                           {/* Selected ring */}
                           {isSelected && (
@@ -350,22 +385,6 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                               }}
                             />
                           )}
-
-                          {/* Placeholder number */}
-                          <span
-                            style={{
-                              position: "absolute",
-                              inset: 0,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: 12,
-                              fontWeight: 500,
-                              color: "rgba(255,255,255,0.3)",
-                            }}
-                          >
-                            {i + 1}
-                          </span>
                         </motion.div>
 
                         {/*
@@ -390,7 +409,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                               letterSpacing: "0.01em",
                             }}
                           >
-                            {IMAGE_CAPTIONS[i]}
+                            {resolvedCaptions[i]}
                           </p>
                         </div>
                       </motion.div>
