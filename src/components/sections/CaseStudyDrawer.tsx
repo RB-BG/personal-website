@@ -58,14 +58,17 @@ function CaseStudyDrawer({ project, onClose }: CaseStudyDrawerProps) {
             aria-hidden
           />
 
-          {/* Drawer panel */}
+          {/* Drawer panel — slides in from the same side as the project image */}
           <motion.aside
             key="cs-drawer"
-            initial={{ x: "100%" }}
+            initial={{ x: project.imgLeft ? "-100%" : "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            exit={{ x: project.imgLeft ? "-100%" : "100%" }}
             transition={{ type: "spring", stiffness: 360, damping: 42, mass: 1 }}
-            className="fixed top-0 right-0 bottom-0 z-50 flex w-full max-w-[680px] flex-col bg-white shadow-2xl"
+            className={cn(
+              "fixed top-0 bottom-0 z-50 flex w-full max-w-[680px] flex-col bg-white shadow-2xl",
+              project.imgLeft ? "left-0" : "right-0",
+            )}
             role="dialog"
             aria-modal="true"
             aria-label={`Case study: ${project.company}`}
