@@ -11,9 +11,10 @@ import { cn } from "@/lib/utils"
 type ProjectSectionProps = {
   project: Project
   onOpenCaseStudy: () => void
+  onOpenGallery: () => void
 }
 
-function ProjectSection({ project, onOpenCaseStudy }: ProjectSectionProps) {
+function ProjectSection({ project, onOpenCaseStudy, onOpenGallery }: ProjectSectionProps) {
   const {
     company,
     period,
@@ -52,7 +53,7 @@ function ProjectSection({ project, onOpenCaseStudy }: ProjectSectionProps) {
       </ParallaxShape>
 
       <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-20 lg:grid-cols-[1.1fr_1fr]">
-        {imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft />}
+        {imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft onOpenGallery={onOpenGallery} />}
 
         <FadeIn y={20}>
           <p
@@ -101,7 +102,7 @@ function ProjectSection({ project, onOpenCaseStudy }: ProjectSectionProps) {
           </button>
         </FadeIn>
 
-        {!imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft={false} />}
+        {!imgLeft && <ProjectImage gradient={gradient} badge={badge} imgLeft={false} onOpenGallery={onOpenGallery} />}
       </div>
     </section>
   )
@@ -111,17 +112,19 @@ type ProjectImageProps = {
   gradient: Project["gradient"]
   badge?: string
   imgLeft: boolean
+  onOpenGallery: () => void
 }
 
-function ProjectImage({ gradient, badge, imgLeft }: ProjectImageProps) {
+function ProjectImage({ gradient, badge, imgLeft, onOpenGallery }: ProjectImageProps) {
   return (
     <motion.div
       whileHover={{ scale: 1.015, y: -6 }}
       transition={{ type: "spring", stiffness: 240, damping: 24 }}
-      className="relative aspect-[4/3] overflow-hidden rounded-[28px]"
+      className="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-[28px]"
       style={{
         background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.via} 55%, ${gradient.to} 100%)`,
       }}
+      onClick={onOpenGallery}
     >
       {/* grid overlay */}
       <div
@@ -152,6 +155,13 @@ function ProjectImage({ gradient, badge, imgLeft }: ProjectImageProps) {
         <br />
         placeholder
       </span>
+
+      {/* Gallery hint — fades in on hover */}
+      <div className="absolute inset-x-0 bottom-0 flex justify-center pb-5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <span className="rounded-full bg-black/25 px-3.5 py-1.5 text-[12px] font-semibold text-white backdrop-blur-sm">
+          View gallery
+        </span>
+      </div>
     </motion.div>
   )
 }
