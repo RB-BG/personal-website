@@ -1,3 +1,14 @@
+export type CaseStudySection = {
+  heading: string
+  body: string
+}
+
+export type CaseStudy = {
+  intro: string
+  sections: ReadonlyArray<CaseStudySection>
+  outcomes: ReadonlyArray<string>
+}
+
 export type Project = {
   slug: string
   company: string
@@ -16,8 +27,10 @@ export type Project = {
   bgClass: string
   /** If true, image is rendered on the left, content on the right. */
   imgLeft: boolean
-  /** Placeholder href until case-study pages exist. */
+  /** Placeholder href — will become a route in Phase 3. */
   href: string
+  /** Expanded case study content shown in the slide-in drawer. */
+  caseStudy: CaseStudy
 }
 
 export const projects: ReadonlyArray<Project> = [
@@ -35,6 +48,30 @@ export const projects: ReadonlyArray<Project> = [
     bgClass: "bg-stone-50",
     imgLeft: true,
     href: "#",
+    caseStudy: {
+      intro:
+        "When I joined Brand Boekhouders in early 2025, a 20-person bookkeeping firm had outgrown its tooling. Critical workflows ran across Excel sheets, disconnected SaaS subscriptions, and email threads — with no single source of truth and no audit trail. My mandate was to fix that from the ground up.",
+      sections: [
+        {
+          heading: "The problem",
+          body: "Bookkeepers were spending hours each week on manual reconciliation, client onboarding required copying data across three systems, and management had no real-time visibility into firm performance. Every process depended on individual tribal knowledge rather than documented, repeatable systems.",
+        },
+        {
+          heading: "Infrastructure first",
+          body: "Before writing a single line of product code I audited every tool in use, mapped all workflows end-to-end, and identified the highest-leverage problems. From that I established a proper development environment: Git-based version control, a CI/CD pipeline, and a staging environment — none of which existed before.",
+        },
+        {
+          heading: "Building BERP",
+          body: "I defined the architecture for BERP, a purpose-built ERP for bookkeeping firms, and made the technology decisions: React 19 with TypeScript on the frontend for a fast, type-safe UI, and Django 5 with Django REST Framework on the backend for a clean, maintainable API. I led product strategy, wrote specifications, and delivered the first working modules.",
+        },
+      ],
+      outcomes: [
+        "First working module shipped Q2 2025, live for all internal users",
+        "Client onboarding time reduced from days to hours",
+        "Eliminated reliance on 3 disconnected SaaS tools for core workflows",
+        "Full CI/CD pipeline with automated linting, tests and deployment",
+      ],
+    },
   },
   {
     slug: "netcompany",
@@ -49,6 +86,30 @@ export const projects: ReadonlyArray<Project> = [
     bgClass: "bg-white",
     imgLeft: false,
     href: "#",
+    caseStudy: {
+      intro:
+        "At Netcompany I worked as an interface consultant embedded in three scrum teams, each building a digital platform for a Dutch government client. Every project came with its own stakeholders, technical constraints, and — critically — strict WCAG 2.0 accessibility requirements.",
+      sections: [
+        {
+          heading: "DuboCalc — Rijkswaterstaat",
+          body: "DuboCalc is the sustainability calculation tool used by engineers on Dutch infrastructure projects. I redesigned the core interface to improve usability for complex multi-step forms, audited every component for WCAG 2.0 AA compliance, and delivered high-fidelity Figma prototypes that fed directly into the development sprint.",
+        },
+        {
+          heading: "VFPF pension portal",
+          body: "The VFPF portal serves pension fund members across a wide age range. I designed member-facing dashboards that had to be both data-rich and immediately legible, with particular attention to contrast ratios, typographic hierarchy, and clear plain-language copy — working closely with the client's communications team.",
+        },
+        {
+          heading: "Studielink",
+          body: "Studielink is the application portal used by every Dutch student enrolling at university. I focused on reducing friction in the application flow, mapping the existing journey, identifying drop-off points, and prototyping a simplified multi-step form experience validated with usability testing.",
+        },
+      ],
+      outcomes: [
+        "All three platforms delivered WCAG 2.0 AA compliant",
+        "Prototypes handed off in Figma and React-ready component specs",
+        "Studielink flow reduced perceived complexity by consolidating 7 steps to 4",
+        "VFPF portal passed internal accessibility audit on first review",
+      ],
+    },
   },
   {
     slug: "ranj",
@@ -64,6 +125,30 @@ export const projects: ReadonlyArray<Project> = [
     bgClass: "bg-stone-50",
     imgLeft: true,
     href: "#",
+    caseStudy: {
+      intro:
+        "&Ranj is one of Europe's most respected serious game studios. During my internship I worked on a research question at the intersection of AI, game design, and learning science: can a conversational AI tutor improve learning outcomes in games without being tightly coupled to a specific game's mechanics?",
+      sections: [
+        {
+          heading: "The research question",
+          body: "Existing AI tutors in games are typically hard-wired to a single title — they know the game world, its characters, its progression. That makes them expensive to build and impossible to reuse. The question was whether a game-agnostic tutor could be just as effective, by focusing on the learner rather than the game.",
+        },
+        {
+          heading: "Framework design",
+          body: "I designed a tutor framework grounded in Socratic dialogue, spaced repetition, and cognitive load theory. The tutor communicates via in-game overlay, asking questions rather than giving answers, and adapts its level of scaffolding based on the player's demonstrated knowledge. The key design constraint: it had to work across entirely different game genres without modification.",
+        },
+        {
+          heading: "Testing with players",
+          body: "Working with the game design and learning science teams I built and tested prototypes with real players across two game titles. I ran observational sessions, conducted post-session interviews, and iterated on the dialogue design and feedback timing based on findings — working in short research sprints.",
+        },
+      ],
+      outcomes: [
+        "Framework adopted as the internal standard for AI-assisted learning features",
+        "Applied to two shipped &Ranj game titles",
+        "Research findings documented in an internal whitepaper",
+        "Tutor design reusable across game genres without re-engineering",
+      ],
+    },
   },
   {
     slug: "long-covid-toolkit",
@@ -78,5 +163,29 @@ export const projects: ReadonlyArray<Project> = [
     bgClass: "bg-white",
     imgLeft: false,
     href: "#",
+    caseStudy: {
+      intro:
+        "In 2023 I volunteered as design and project specialist for the Long Covid Toolkit, a pro-bono initiative bringing together patients, clinicians, and researchers. The goal: build the most comprehensive, evidence-based online resource for people living with Long Covid — and make it actually usable.",
+      sections: [
+        {
+          heading: "The challenge",
+          body: "Long Covid patients are dealing with dozens of fluctuating symptoms, a medical community still catching up, and an internet full of misinformation. The toolkit needed to be rigorously evidence-based and clinician-approved, while also being accessible, non-overwhelming, and empowering — not clinical and cold.",
+        },
+        {
+          heading: "Design process",
+          body: "I ran co-design sessions with Long Covid patients to ground every design decision in real needs rather than assumptions. What information do you look for on a bad day? What makes you feel more in control? The sessions surfaced a clear preference for bite-sized, actionable content over long clinical summaries — which shaped the entire content structure.",
+        },
+        {
+          heading: "Building in public",
+          body: "I led the full website design, from information architecture through to the final UI, and defined the project requirements that the development team worked from. I also supported community management, helping coordinate the volunteer team of clinicians and patient advocates spread across the Netherlands and UK.",
+        },
+      ],
+      outcomes: [
+        "Platform launched on schedule, summer 2023",
+        "Thousands of page visits within the first month",
+        "Featured and shared by multiple Long Covid patient advocacy groups",
+        "Used as a reference resource by healthcare providers in the Netherlands and UK",
+      ],
+    },
   },
 ]
