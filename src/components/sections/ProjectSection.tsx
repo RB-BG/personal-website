@@ -118,11 +118,12 @@ type ProjectImageProps = {
 function ProjectImage({ gradient, badge, imgLeft, onOpenGallery }: ProjectImageProps) {
   return (
     <motion.div
-      whileHover={{ scale: 1.015, y: -6 }}
+      whileHover={{ scale: 1.015, y: -8 }}
       transition={{ type: "spring", stiffness: 240, damping: 24 }}
       className="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-[28px]"
       style={{
         background: `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.via} 55%, ${gradient.to} 100%)`,
+        boxShadow: `0 24px 64px -4px ${gradient.via}55`,
       }}
       onClick={onOpenGallery}
     >
