@@ -224,11 +224,12 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       </div>
 
       {/*
-       * Scrollable masonry container.
-       * scrollbar-width: none hides the scrollbar while keeping it functional.
+       * Outer div: scroll only — overflow-y: auto implicitly clips overflow-x
+       * too (CSS spec), so we keep this wrapper tight and give the inner
+       * content div horizontal padding so edge images can scale outward on
+       * hover without being clipped.
        */}
       <div
-        ref={containerRef}
         className="pointer-events-auto"
         style={{
           width: "min(80vw, 680px)",
@@ -237,6 +238,11 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
           scrollbarWidth: "none",
         }}
       >
+        {/*
+         * Inner div: measured for layout width, padded so the 1.10× hover
+         * scale on edge images doesn't hit the container boundary.
+         */}
+        <div ref={containerRef} style={{ padding: "12px 14px" }}>
         <LayoutGroup>
           {/* Absolutely-positioned masonry — height driven by computed layout */}
           <motion.div
@@ -350,6 +356,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
             })}
           </motion.div>
         </LayoutGroup>
+        </div>
       </div>
     </motion.div>
   )
