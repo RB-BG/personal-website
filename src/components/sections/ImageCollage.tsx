@@ -25,6 +25,19 @@ const IMAGE_RATIOS = [
    2 / 3,  // portrait
 ]
 
+/** Placeholder captions — replace with real descriptions per image. */
+const IMAGE_CAPTIONS = [
+  "Product strategy overview",
+  "Team collaboration session",
+  "Design system components",
+  "User research insights",
+  "Prototype walkthrough",
+  "Workshop facilitation",
+  "Sprint review highlights",
+  "Stakeholder presentation",
+  "Launch day moments",
+]
+
 // ---- entrance animation config ----
 
 const ENTRANCE = [
@@ -212,7 +225,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       className="pointer-events-none fixed inset-0 z-[60] flex flex-col items-center justify-center px-8 py-12"
     >
       {/* Back button */}
-      <div className="pointer-events-auto mb-5 w-full max-w-[680px]">
+      <div className="pointer-events-auto mb-5 w-full max-w-[860px]">
         <button
           ref={closeButtonRef}
           onClick={onClose}
@@ -232,7 +245,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       <div
         className="pointer-events-auto"
         style={{
-          width: "min(80vw, 680px)",
+          width: "min(90vw, 860px)",
           maxHeight: "calc(100vh - 180px)",
           overflowY: "auto",
           scrollbarWidth: "none",
@@ -266,6 +279,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                     itemRefs.current[i] = el
                   }}
                   layout
+                  className="group"
                   transition={{
                     layout: { type: "spring", stiffness: 260, damping: 28 },
                   }}
@@ -349,6 +363,27 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
                       >
                         {i + 1}
                       </span>
+
+                      {/* Hover info overlay — fades in like Instagram caption */}
+                      <div
+                        className="absolute inset-x-0 bottom-0 translate-y-1 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
+                        style={{
+                          background: "linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 60%, transparent 100%)",
+                          padding: "36px 12px 12px",
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: "rgba(255,255,255,0.95)",
+                            lineHeight: 1.35,
+                            letterSpacing: "0.01em",
+                          }}
+                        >
+                          {IMAGE_CAPTIONS[i]}
+                        </p>
+                      </div>
                     </motion.div>
                   </motion.div>
                 </motion.div>
