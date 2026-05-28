@@ -181,7 +181,7 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
 
   /**
    * Hover wave — exponential falloff from hovered image centre.
-   * Hovered: 1.10 (grows), direct neighbour: ~0.86, far: ~0.98.
+   * Hovered: 1.06 (subtle grow), nearby: slight shrink, far: ~1.
    */
   const handleMouseEnter = useCallback(
     (i: number) => {
@@ -194,13 +194,13 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       setScales(
         itemRefs.current.map((ref, j) => {
           if (!ref) return 1
-          if (j === i) return 1.10
+          if (j === i) return 1.06
           const r = ref.getBoundingClientRect()
           const dist = Math.hypot(
             cx - (r.left + r.width / 2),
             cy - (r.top + r.height / 2),
           )
-          return 1 - 0.16 * Math.exp(-dist / 280)
+          return 1 - 0.10 * Math.exp(-dist / 280)
         }),
       )
     },
@@ -222,176 +222,184 @@ function ImageCollageGrid({ project, onClose }: GridProps) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.94 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      className="pointer-events-none fixed inset-0 z-[60] flex flex-col items-center justify-center px-8 py-12"
+      className="pointer-events-none fixed inset-0 z-[60] flex flex-col items-center justify-center py-12"
     >
-      {/* Back button */}
-      <div className="pointer-events-auto mb-5 w-full max-w-[860px]">
-        <button
-          ref={closeButtonRef}
-          onClick={onClose}
-          className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-[13px] font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-white"
-        >
-          <ArrowLeft className="size-4" strokeWidth={2.5} />
-          Back
-        </button>
-      </div>
-
       {/*
-       * Outer div: scroll only — overflow-y: auto implicitly clips overflow-x
-       * too (CSS spec), so we keep this wrapper tight and give the inner
-       * content div horizontal padding so edge images can scale outward on
-       * hover without being clipped.
+       * Single width-controlled wrapper for back button + scroll area.
+       * Using min(calc(100vw - 64px), 860px) explicitly accounts for the
+       * 32px margin we want on each side, avoiding any flex percentage
+       * resolution edge cases with absolute-positioned children.
        */}
       <div
-        className="pointer-events-auto"
-        style={{
-          width: "100%",
-          maxWidth: 860,
-          maxHeight: "calc(100vh - 180px)",
-          overflowY: "auto",
-          scrollbarWidth: "none",
-        }}
+        className="pointer-events-auto flex flex-col"
+        style={{ width: "min(calc(100vw - 64px), 860px)" }}
       >
-        {/*
-         * Inner div: measured for layout width, padded so the 1.10× hover
-         * scale on edge images doesn't hit the container boundary.
-         */}
-        <div ref={containerRef} style={{ padding: "12px 20px" }}>
-        <LayoutGroup>
-          {/* Absolutely-positioned masonry — height driven by computed layout */}
-          <motion.div
-            layout
-            style={{ position: "relative", height: layout.totalH }}
+        {/* Back button */}
+        <div className="mb-5">
+          <button
+            ref={closeButtonRef}
+            onClick={onClose}
+            className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-[13px] font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-white"
           >
-            {IMAGE_RATIOS.map((_, i) => {
-              const item = layout.items[i]
-              const cfg = ENTRANCE[i]
-              const isSelected = selectedIdx === i
+            <ArrowLeft className="size-4" strokeWidth={2.5} />
+            Back
+          </button>
+        </div>
 
-              return (
-                /*
-                 * Layout layer — absolute position set by the masonry algorithm.
-                 * framer-motion FLIP animates from old → new bounding box on
-                 * selectedIdx change (single-col → two-col span and back).
-                 */
-                <motion.div
-                  key={i}
-                  ref={(el) => {
-                    itemRefs.current[i] = el
-                  }}
-                  layout
-                  className="group"
-                  transition={{
-                    layout: { type: "spring", stiffness: 260, damping: 28 },
-                  }}
-                  style={{
-                    position: "absolute",
-                    left: item?.x ?? 0,
-                    top: item?.y ?? 0,
-                    width: item?.w ?? 0,
-                    height: item?.h ?? 0,
-                    cursor: "pointer",
-                    borderRadius: 14,
-                  }}
-                  onMouseEnter={() => handleMouseEnter(i)}
-                  onMouseLeave={handleMouseLeave}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleClick(i)
-                  }}
-                >
-                  {/* Wave scale layer — isolated so it doesn't compound with FLIP */}
-                  <motion.div
-                    animate={{ scale: scales[i] }}
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      borderRadius: 14,
-                      overflow: "hidden",
-                      background: gradients[i],
-                    }}
-                  >
-                    {/* Entrance layer — one-time bubbly spring, delay isolated here */}
+        {/*
+         * Scroll container: overflow-y: auto implicitly clips overflow-x.
+         * The inner padding div gives edge images room to scale outward
+         * without hitting the clip boundary (6px spare at 1.06 scale).
+         */}
+        <div
+          style={{
+            maxHeight: "calc(100vh - 180px)",
+            overflowY: "auto",
+            scrollbarWidth: "none",
+          }}
+        >
+          <div ref={containerRef} style={{ padding: "12px 20px" }}>
+            <LayoutGroup>
+              {/* Absolutely-positioned masonry — height driven by computed layout */}
+              <motion.div
+                layout
+                style={{ position: "relative", height: layout.totalH }}
+              >
+                {IMAGE_RATIOS.map((_, i) => {
+                  const item = layout.items[i]
+                  const cfg = ENTRANCE[i]
+                  const isSelected = selectedIdx === i
+
+                  return (
+                    /*
+                     * Layout layer — absolute position set by the masonry
+                     * algorithm. framer-motion FLIP animates on selectedIdx
+                     * change (single-col → two-col span and back).
+                     */
                     <motion.div
-                      initial={{ scale: 0.55, opacity: 0, rotate: cfg.rotate }}
-                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                      transition={{
-                        delay: cfg.delay,
-                        type: "spring",
-                        stiffness: cfg.stiffness,
-                        damping: cfg.damping,
+                      key={i}
+                      ref={(el) => {
+                        itemRefs.current[i] = el
                       }}
-                      style={{ position: "absolute", inset: 0, background: gradients[i] }}
+                      layout
+                      className="group"
+                      transition={{
+                        layout: { type: "spring", stiffness: 260, damping: 28 },
+                      }}
+                      style={{
+                        position: "absolute",
+                        left: item?.x ?? 0,
+                        top: item?.y ?? 0,
+                        width: item?.w ?? 0,
+                        height: item?.h ?? 0,
+                        cursor: "pointer",
+                        borderRadius: 14,
+                      }}
+                      onMouseEnter={() => handleMouseEnter(i)}
+                      onMouseLeave={handleMouseLeave}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleClick(i)
+                      }}
                     >
-                      {/* Grid texture */}
-                      <div
-                        aria-hidden
+                      {/* Wave scale layer — isolated so it doesn't compound with FLIP */}
+                      <motion.div
+                        animate={{ scale: scales[i] }}
+                        transition={{ type: "spring", stiffness: 380, damping: 32 }}
                         style={{
                           position: "absolute",
                           inset: 0,
-                          backgroundImage:
-                            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
-                          backgroundSize: "32px 32px",
+                          borderRadius: 14,
+                          overflow: "hidden",
+                          background: gradients[i],
                         }}
-                      />
-
-                      {/* Selected ring */}
-                      {isSelected && (
-                        <div
-                          aria-hidden
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            borderRadius: 14,
-                            boxShadow: "inset 0 0 0 2.5px rgba(255,255,255,0.65)",
+                      >
+                        {/* Entrance layer — one-time bubbly spring, delay isolated here */}
+                        <motion.div
+                          initial={{ scale: 0.55, opacity: 0, rotate: cfg.rotate }}
+                          animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                          transition={{
+                            delay: cfg.delay,
+                            type: "spring",
+                            stiffness: cfg.stiffness,
+                            damping: cfg.damping,
                           }}
-                        />
-                      )}
+                          style={{ position: "absolute", inset: 0, background: gradients[i] }}
+                        >
+                          {/* Grid texture */}
+                          <div
+                            aria-hidden
+                            style={{
+                              position: "absolute",
+                              inset: 0,
+                              backgroundImage:
+                                "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+                              backgroundSize: "32px 32px",
+                            }}
+                          />
 
-                      {/* Placeholder number */}
-                      <span
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 12,
-                          fontWeight: 500,
-                          color: "rgba(255,255,255,0.3)",
-                        }}
-                      >
-                        {i + 1}
-                      </span>
+                          {/* Selected ring */}
+                          {isSelected && (
+                            <div
+                              aria-hidden
+                              style={{
+                                position: "absolute",
+                                inset: 0,
+                                borderRadius: 14,
+                                boxShadow: "inset 0 0 0 2.5px rgba(255,255,255,0.65)",
+                              }}
+                            />
+                          )}
 
-                      {/* Hover info overlay — fades in like Instagram caption */}
-                      <div
-                        className="absolute inset-x-0 bottom-0 translate-y-1 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
-                        style={{
-                          background: "linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 60%, transparent 100%)",
-                          padding: "36px 12px 12px",
-                        }}
-                      >
-                        <p
+                          {/* Placeholder number */}
+                          <span
+                            style={{
+                              position: "absolute",
+                              inset: 0,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: 12,
+                              fontWeight: 500,
+                              color: "rgba(255,255,255,0.3)",
+                            }}
+                          >
+                            {i + 1}
+                          </span>
+                        </motion.div>
+
+                        {/*
+                         * Hover info overlay — direct child of the overflow:hidden
+                         * wave scale layer, NOT inside the entrance animation layer.
+                         * Putting it inside a transformed element (entrance layer)
+                         * breaks overflow clipping in Safari/some browsers.
+                         */}
+                        <div
+                          className="absolute inset-x-0 bottom-0 translate-y-1 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
                           style={{
-                            fontSize: 11,
-                            fontWeight: 600,
-                            color: "rgba(255,255,255,0.95)",
-                            lineHeight: 1.35,
-                            letterSpacing: "0.01em",
+                            background: "linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 60%, transparent 100%)",
+                            padding: "36px 12px 12px",
                           }}
                         >
-                          {IMAGE_CAPTIONS[i]}
-                        </p>
-                      </div>
+                          <p
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 600,
+                              color: "rgba(255,255,255,0.95)",
+                              lineHeight: 1.35,
+                              letterSpacing: "0.01em",
+                            }}
+                          >
+                            {IMAGE_CAPTIONS[i]}
+                          </p>
+                        </div>
+                      </motion.div>
                     </motion.div>
-                  </motion.div>
-                </motion.div>
-              )
-            })}
-          </motion.div>
-        </LayoutGroup>
+                  )
+                })}
+              </motion.div>
+            </LayoutGroup>
+          </div>
         </div>
       </div>
     </motion.div>
