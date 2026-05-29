@@ -193,7 +193,7 @@ function ProjectImage({ gradient, badge, imgLeft, screenshot, onOpenGallery }: P
       )}
 
       {badge && (
-        <span className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[12px] font-semibold tracking-[0.1em] text-white uppercase backdrop-blur-sm">
+        <span className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full bg-stone-950/60 px-3.5 py-1.5 text-[12px] font-semibold tracking-[0.1em] text-white uppercase backdrop-blur-sm">
           <span className="size-1.5 rounded-full bg-brand-400" />
           {badge}
         </span>
