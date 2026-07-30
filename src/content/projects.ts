@@ -94,6 +94,13 @@ export const projects: ReadonlyArray<Project> = [
     bgClass: "bg-white",
     imgLeft: false,
     href: "#",
+    screenshot: "/images/DubocalcMaterials.png",
+    galleryImages: [
+      { src: "/images/DubocalcMaterials.png", ratio: 1946 / 1206, caption: "DuboCalc — Nationale Milieudatabase" },
+      { src: "/images/VfpfDashboard.png", ratio: 1680 / 1057, caption: "VFPF — Uitkeringen dashboard" },
+      { src: "/images/DubocalcMki.png", ratio: 1946 / 1580, caption: "DuboCalc — MKI-waardes & levenscyclusanalyse" },
+      { src: "/images/VfpfDetail.png", ratio: 1680 / 1370, caption: "VFPF — Uitkering detail & beschikking" },
+    ],
     caseStudy: {
       intro:
         "At Netcompany I worked as an interface consultant embedded in three scrum teams, each building a digital platform for a Dutch government client. Every project came with its own stakeholders, technical constraints, and — critically — strict WCAG 2.0 accessibility requirements.",
@@ -108,13 +115,13 @@ export const projects: ReadonlyArray<Project> = [
         },
         {
           heading: "Studielink",
-          body: "Studielink is the application portal used by every Dutch student enrolling at university. I focused on reducing friction in the application flow, mapping the existing journey, identifying drop-off points, and prototyping a simplified multi-step form experience validated with usability testing.",
+          body: "Studielink is the enrolment portal used by every prospective student in the Netherlands. Here I worked as a business analyst rather than a designer, focused on the international student login flow. I reworked the phone-number verification step &mdash; mapping the existing journey, specifying the requirements and edge cases, and aligning the flow with the development team.",
         },
       ],
       outcomes: [
         "All three platforms delivered WCAG 2.0 AA compliant",
         "Prototypes handed off in Figma and React-ready component specs",
-        "Studielink flow reduced perceived complexity by consolidating 7 steps to 4",
+        "Reworked Studielink's phone-number verification flow for international students",
         "VFPF portal passed internal accessibility audit on first review",
       ],
     },
@@ -171,6 +178,11 @@ export const projects: ReadonlyArray<Project> = [
     bgClass: "bg-white",
     imgLeft: false,
     href: "#",
+    screenshot: "/images/LongCovidMedicine.png",
+    galleryImages: [
+      { src: "/images/LongCovidMedicine.png", ratio: 1438 / 1234, caption: "Long Covid Toolkit — medicijn-effectiviteit & bewijs" },
+      { src: "/images/LongCovidTreatments.png", ratio: 1440 / 1024, caption: "Long Covid Toolkit — behandelingen overzicht" },
+    ],
     caseStudy: {
       intro:
         "In 2023 I volunteered as design and project specialist for the Long Covid Toolkit, a pro-bono initiative bringing together patients, clinicians, and researchers. The goal: build the most comprehensive, evidence-based online resource for people living with Long Covid — and make it actually usable.",
