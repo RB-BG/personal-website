@@ -125,35 +125,25 @@ The z-indices are deliberately above the sticky header (`z-50`) so the header di
 
 **`ImageCollage`** uses `key={project.slug}` on the inner `ImageCollageGrid` so the component fully remounts (resetting all state) each time a different project's gallery is opened.
 
-## Masonry layout algorithm
+## Gallery layout: react-photo-album + yet-another-react-lightbox
 
-`ImageCollage.tsx` implements a Pinterest-style masonry layout in `computeLayout()`. It runs in JavaScript rather than CSS because framer-motion needs explicit pixel positions for FLIP animation.
+`ImageCollage.tsx` uses two off-the-shelf libraries instead of a hand-rolled layout:
 
-**Normal state:** images fill three equal-width columns. Each image is placed in the currently-shortest column (`colH.indexOf(Math.min(...colH))`). Height is derived from the image's aspect ratio: `h = colWidth / ratio`.
+- **`react-photo-album`** (`RowsPhotoAlbum`) renders a justified-rows layout — horizontal bricks, each row height-balanced to the container width. Ideal for landscape-heavy imagery. Row height is responsive via `targetRowHeight={(w) => ...}`.
+- **`yet-another-react-lightbox`** renders the fullscreen viewer (swipe, arrow keys, captions plugin) when a tile is clicked.
 
-**Selected state:** clicking an image sets `selectedIdx`. That image spans 2 adjacent columns (the pair whose taller column is currently lowest). Width doubles to `colW * 2 + GAP`, height recalculates proportionally. framer-motion's `layout` prop FLIP-animates every image from its old bounding box to its new one.
+Both are driven by one `photos` array built each render: real images come from `project.galleryImages`, and any remaining slots fall back to gradient placeholders (`PLACEHOLDER_RATIOS` / `PLACEHOLDER_CAPTIONS`). Each entry carries `width`/`height` (derived from `ratio`), a `caption`, and an optional `gradient` string that marks it as a placeholder.
 
-### Three-layer motion structure per image tile
+### Rendering placeholders through the libraries
 
-Each tile uses three nested `motion.div` elements to keep concerns isolated:
+Placeholders have no real image, so both libraries are given a custom render function:
 
-```
-motion.div  layout (FLIP)        — absolute-positioned by masonry algorithm, animates on selection change
-  motion.div  wave scale         — animates scale: [0.9..1.06], overflow: hidden, clips content
-    motion.div  entrance         — one-time spring on mount (scale 0.55→1, rotate→0, staggered delay)
-      {grid texture, selected ring, placeholder number}
-    div  hover caption overlay   — direct child of wave scale, NOT inside entrance layer
-```
+- `RowsPhotoAlbum`'s `render.image` returns a gradient `<div>` (with grid texture + number) for placeholder photos, and a plain `<img>` for real ones. The same wrapper adds rounded corners and the hover-caption overlay via a `group` class.
+- `Lightbox`'s `render.slide` returns a gradient `<div>` (sized by aspect ratio) when the slide has a `gradient` field, and `undefined` otherwise so the default image slide is used. This prevents the lightbox from trying to load the empty `src` of a placeholder.
 
-The caption overlay must be a direct child of the `overflow: hidden` wave scale layer, not nested inside the entrance animation layer. Putting it inside a transformed element breaks `overflow: hidden` clipping in Safari.
+### `defaultContainerWidth`
 
-### Hover wave effect
-
-`handleMouseEnter` uses `getBoundingClientRect()` to compute pixel distance from the hovered image centre to every other image centre. Scale for each image is: `1 - 0.10 * Math.exp(-dist / 280)`. The hovered image itself gets `1.06`. This gives a subtle ripple that falls off naturally with distance, regardless of masonry column position.
-
-### Edge-clipping prevention
-
-`overflow-y: auto` on the scroll container implicitly clips `overflow-x` too (CSS spec). The inner `containerRef` div therefore has `padding: "12px 20px"`. The `ResizeObserver` reads `contentRect.width` (content box, after padding), so the masonry algorithm computes against the narrower inner width. At `1.06` scale on `~265px` columns, the maximum edge expansion is about 13px. The 20px padding gives a comfortable 7px spare.
+`react-photo-album` measures its container with a `ResizeObserver` and renders nothing until the width is known. `defaultContainerWidth={860}` gives it a sensible first-paint guess (matching the overlay's max width) so tiles appear immediately instead of after a measurement tick.
 
 ## CSS-only marquee
 
@@ -167,4 +157,5 @@ We chose this over framer-motion because the marquee runs continuously (no scrol
 - **`react-refresh/only-export-components` is suppressed on the two `ui/*` files** (`Button` and `Badge`) because they export both the component and its `*Variants` CVA function, which the rule does not allow. This matches the shadcn convention. If you add more `ui/*` components with the same pattern, add the disable comment.
 - **No `dangerouslySetInnerHTML` workaround for typography.** Project titles and bodies use it only to allow HTML entities (`&mdash;`, `<strong>`) inside content data without React escaping them. If we later need richer formatting, switch to a markdown parser or compose React children in the content file.
 - **No routing yet.** The case study drawer is a slide-in panel, not a real route. Phase 3 adds `react-router-dom` + `/work/[slug]` pages. The `href` field on each project in `projects.ts` is ready to receive the real path.
-- **`IMAGE_RATIOS` and `IMAGE_CAPTIONS` in `ImageCollage.tsx`** are placeholders. When real screenshots are available, update both arrays with the actual aspect ratios (width/height) and captions per image. The masonry layout recalculates automatically.
+- **Gallery images live in `projects.ts`, not `ImageCollage.tsx`.** Add real screenshots to a project's `galleryImages` array (`{ src, ratio, caption }`); the `PLACEHOLDER_RATIOS` / `PLACEHOLDER_CAPTIONS` constants in `ImageCollage.tsx` only fill leftover slots. See [CONTENT.md](./CONTENT.md).
+- **The gallery uses `react-photo-album` + `yet-another-react-lightbox`** rather than a custom masonry/lightbox. It was rewritten from a hand-rolled `computeLayout()` implementation for simplicity and standard behaviour.

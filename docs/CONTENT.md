@@ -44,32 +44,25 @@ Open `src/content/projects.ts`. Each project is an object in the `projects` arra
 
 ## Editing the image gallery (ImageCollage)
 
-Each project has a gallery overlay. The images are currently placeholders. Two constants at the top of `src/components/sections/ImageCollage.tsx` control them:
+Each project has a gallery overlay built on [`react-photo-album`](https://react-photo-album.com/) (justified rows layout) and [`yet-another-react-lightbox`](https://yet-another-react-lightbox.com/) (fullscreen viewer). Real images come from the `galleryImages` field on each project in `content/projects.ts`; any remaining slots fall back to gradient placeholders defined in `ImageCollage.tsx`.
+
+To add real images to a project, edit its `galleryImages` array in `content/projects.ts`:
 
 ```ts
-// Aspect ratios (width / height) — one entry per image
-const IMAGE_RATIOS = [
-  16 / 9,  // landscape
-   2 / 3,  // portrait
-   1 / 1,  // square
-  // ...
-]
-
-// Caption shown on hover (one entry per image, same order as ratios)
-const IMAGE_CAPTIONS = [
-  "Product strategy overview",
-  "Team collaboration session",
-  // ...
-]
+galleryImages: [
+  { src: "/images/berp-dashboard.png", ratio: 16 / 9, caption: "BERP Dashboard" },
+  { src: "/images/berp-clients.png",   ratio: 16 / 9, caption: "Client overview" },
+],
 ```
 
-To replace placeholders with real images:
-1. Add the actual images to the `public/` folder or import them as modules.
-2. Update `IMAGE_RATIOS` with the real aspect ratio of each image (`width / height`).
-3. Update `IMAGE_CAPTIONS` with the real caption for each image.
+- `src` — path relative to `public/` (e.g. `/images/foo.png`).
+- `ratio` — aspect ratio as `width / height`. The rows layout sizes tiles from this. Landscape (`16/9`, `3/2`) tiles pack into wide bricks; portrait (`2/3`) tiles stay tall.
+- `caption` — shown on hover in the grid and under the image in the lightbox.
+
+Real images fill slots from index 0 upward. Slots beyond the array use the gradient placeholders (`PLACEHOLDER_RATIOS` / `PLACEHOLDER_CAPTIONS` in `ImageCollage.tsx`), so a project with two real images shows those two followed by placeholder tiles.
 4. Replace the gradient `<div>` inside the entrance animation layer with an `<img>` element.
 
-The masonry layout recalculates from the ratios automatically. Portrait images become taller, landscape images shorter, filling columns proportionally.
+The justified-rows layout recalculates from the ratios automatically. Landscape images pack into wider bricks, portrait images stay narrower, and each row is height-balanced to fill the container width.
 
 ## Editing an education or extra-curricular card
 

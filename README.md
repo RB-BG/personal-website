@@ -76,7 +76,7 @@ src/
 
 **Phase 3 (planned):**
 - Case-study subpages at `/work/[slug]` (requires `react-router-dom`). Drawer content migrates to full pages.
-- Real project screenshots replacing gradient placeholders. Update `IMAGE_RATIOS` + `IMAGE_CAPTIONS` in `ImageCollage.tsx`.
+- Real project screenshots replacing gradient placeholders. Add them to each project's `galleryImages` array in `content/projects.ts`.
 - Portrait photo in the Contact section.
 - SEO meta tags, Open Graph image, favicon redesign.
 - Contact form (Formspree or Resend, currently a `mailto:` link).
