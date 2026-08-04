@@ -13,13 +13,13 @@ function Contact() {
       className="relative overflow-hidden border-t border-stone-200 bg-white px-6 py-48 lg:px-18"
     >
       <ParallaxShape offset={-30} className="absolute -top-30 -right-30">
-        <GradientBlob size={600} color="#a78bfa" opacity={0.12} />
+        <GradientBlob size={600} color="#2f9fc6" opacity={0.12} />
       </ParallaxShape>
       <ParallaxShape offset={-20} className="absolute top-0 right-0">
-        <GhostRing size={380} color="#7c3aed" opacity={0.08} />
+        <GhostRing size={380} color="#db5a24" opacity={0.1} />
       </ParallaxShape>
       <ParallaxShape offset={40} className="absolute -bottom-20 -left-20">
-        <GradientBlob size={400} color="#fde68a" opacity={0.18} />
+        <GradientBlob size={400} color="#db5a24" opacity={0.16} />
       </ParallaxShape>
 
       <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-28 lg:grid-cols-[1fr_1.2fr]">
@@ -28,7 +28,7 @@ function Contact() {
             className="relative aspect-square overflow-hidden rounded-[28px]"
             style={{
               background:
-                "linear-gradient(160deg, #ede9fe 0%, #ddd6fe 40%, #a78bfa 100%)",
+                "linear-gradient(155deg, #e77f47 0%, #db5a24 46%, #2f9fc6 100%)",
             }}
           >
             <DotGrid color="#ffffff" opacity={0.18} spacing={24} />
@@ -38,8 +38,8 @@ function Contact() {
               <br />
               placeholder
             </span>
-            <span className="absolute bottom-6 left-6 inline-flex items-center gap-2 rounded-full bg-white/22 px-4 py-2 text-[13px] font-semibold text-brand-950 backdrop-blur-sm">
-              <span className="size-1.5 rounded-full bg-brand-800" />
+            <span className="absolute bottom-6 left-6 inline-flex items-center gap-2 rounded-md bg-white/25 px-4 py-2 text-[13px] font-semibold text-white backdrop-blur-sm">
+              <span className="size-1.5 rounded-full bg-white" />
               Open to opportunities
             </span>
           </div>

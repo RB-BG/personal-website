@@ -35,7 +35,7 @@ function WorkIntro() {
           </FadeIn>
         </div>
 
-        <div className="mt-20 h-px max-w-[600px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent" />
+        <div className="mt-20 h-px max-w-[600px] bg-gradient-to-r from-brand-500 via-ice-500 to-transparent" />
       </div>
     </section>
   )

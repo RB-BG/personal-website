@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource-variable/bricolage-grotesque";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -17,14 +18,34 @@
     @apply font-sans;
     scroll-behavior: smooth;
   }
+  /* Display face for headings — Bricolage Grotesque carries the personality */
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+  }
   /* Offset scroll target so sticky header doesn't cover anchored sections */
   section[id] {
     scroll-margin-top: 96px;
   }
 }
 
+/* Hero emphasis underline draws itself in */
+@keyframes hero-underline {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Film-grain signature — a subtle warm texture over the whole page */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 @theme inline {
-  --font-heading: var(--font-sans);
+  --font-heading: 'Bricolage Grotesque Variable', 'Geist Variable', sans-serif;
   --font-sans: 'Geist Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -65,18 +86,30 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Brand violet — primary CTAs, headings accent, education cards */
-  --color-brand-50: #f5f3ff;
-  --color-brand-100: #ede9fe;
-  --color-brand-200: #ddd6fe;
-  --color-brand-300: #c4b5fd;
-  --color-brand-400: #a78bfa;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-700: #6d28d9;
-  --color-brand-800: #5b21b6;
-  --color-brand-900: #4c1d95;
-  --color-brand-950: #3730a3;
+  /* Brand orange — primary CTAs, headings accent, warm signal */
+  --color-brand-50: #fdf1ea;
+  --color-brand-100: #fbdccb;
+  --color-brand-200: #f6c3a4;
+  --color-brand-300: #efa376;
+  --color-brand-400: #e77f47;
+  --color-brand-500: #db5a24;
+  --color-brand-600: #c44e1c;
+  --color-brand-700: #a84019;
+  --color-brand-800: #8a3416;
+  --color-brand-900: #6d2b15;
+  --color-brand-950: #3f1a0e;
+
+  /* Ice blue — the cool counter-accent to brand orange */
+  --color-ice-50: #ecf7fb;
+  --color-ice-100: #d2ebf3;
+  --color-ice-200: #a9d9e9;
+  --color-ice-300: #7fc8de;
+  --color-ice-400: #54b3cf;
+  --color-ice-500: #2f9fc6;
+  --color-ice-600: #1f7fa3;
+  --color-ice-700: #175f7c;
+  --color-ice-800: #134d63;
+  --color-ice-900: #0d3a4d;
 
   /* Accent amber — open-to-collab badge, &Ranj */
   --color-amber-50: #fef3c7;
@@ -102,10 +135,15 @@
   --color-pink-700: #be185d;
   --color-pink-900: #831843;
 
-  /* Neutral additions for warm whites used in the design */
-  --color-stone-50: #fafaf9;
-  --color-stone-100: #f7f7f5;
-  --color-stone-150: #f5f5f4;
+  /* Warm ivory neutrals — the ground the whole site sits on */
+  --color-stone-50: #f7f3ea;
+  --color-stone-100: #f2ecdf;
+  --color-stone-150: #ece4d3;
+  --color-stone-200: #e6ddcb;
+  --color-stone-400: #a89e8c;
+  --color-stone-500: #6d6355;
+  --color-stone-600: #5c5346;
+  --color-stone-950: #241d15;
 }
 
 :root {

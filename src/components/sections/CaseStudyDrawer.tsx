@@ -163,7 +163,7 @@ function CaseStudyDrawer({ project, onClose }: CaseStudyDrawerProps) {
                     <span
                       key={tag}
                       className={cn(
-                        "rounded-full px-3.5 py-1.5 text-[13px] font-medium",
+                        "rounded-md px-3.5 py-1.5 text-[13px] font-medium",
                         i === 0
                           ? "bg-gradient-to-br from-brand-100 to-brand-200 font-semibold text-brand-800"
                           : "bg-stone-150 text-stone-600",

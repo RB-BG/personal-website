@@ -6,7 +6,7 @@ function Footer() {
           &copy; 2026 Ruben Baggen &mdash; Utrecht, NL
         </p>
         <p className="text-sm font-medium text-white/35">
-          Built with React, TypeScript &amp; Geist.
+          Built with React, TypeScript &amp; Bricolage Grotesque.
         </p>
       </div>
     </footer>

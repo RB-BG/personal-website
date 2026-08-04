@@ -18,7 +18,7 @@ function Header() {
   const background = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0.85)"],
+    ["rgba(247, 243, 234, 0)", "rgba(247, 243, 234, 0.85)"],
   )
   const borderOpacity = useTransform(scrollY, [0, 80], [0, 1])
   const active = useActiveSection(SECTIONS)
@@ -59,7 +59,7 @@ function Header() {
 
         <a
           href="#contact"
-          className="inline-flex items-center gap-2 rounded-full bg-brand-800 px-6 py-3 text-[15px] font-medium text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md"
+          className="inline-flex items-center gap-2 rounded-[7px] bg-brand-600 px-6 py-3 text-[15px] font-medium text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md"
         >
           Get in touch
           <ArrowRight className="size-[15px]" strokeWidth={2.5} />

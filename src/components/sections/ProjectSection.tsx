@@ -78,7 +78,7 @@ function ProjectSection({ project, onOpenCaseStudy, onOpenGallery }: ProjectSect
               <span
                 key={tag}
                 className={cn(
-                  "rounded-full px-3.5 py-1.5 text-[13px] font-medium",
+                  "rounded-md px-3.5 py-1.5 text-[13px] font-medium",
                   i === 0
                     ? "bg-gradient-to-br from-brand-100 to-brand-200 font-semibold text-brand-800"
                     : "bg-stone-150 text-stone-600",
@@ -193,7 +193,7 @@ function ProjectImage({ gradient, badge, imgLeft, screenshot, onOpenGallery }: P
       )}
 
       {badge && (
-        <span className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full bg-stone-950/60 px-3.5 py-1.5 text-[12px] font-semibold tracking-[0.1em] text-white uppercase backdrop-blur-sm">
+        <span className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-md bg-stone-950/60 px-3.5 py-1.5 text-[12px] font-semibold tracking-[0.1em] text-white uppercase backdrop-blur-sm">
           <span className="size-1.5 rounded-full bg-brand-400" />
           {badge}
         </span>
@@ -201,7 +201,7 @@ function ProjectImage({ gradient, badge, imgLeft, screenshot, onOpenGallery }: P
 
       {/* Gallery hint — fades in on hover */}
       <div className="absolute inset-x-0 bottom-0 flex justify-center pb-5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-        <span className="rounded-full bg-black/25 px-3.5 py-1.5 text-[12px] font-semibold text-white backdrop-blur-sm">
+        <span className="rounded-md bg-black/25 px-3.5 py-1.5 text-[12px] font-semibold text-white backdrop-blur-sm">
           View gallery
         </span>
       </div>

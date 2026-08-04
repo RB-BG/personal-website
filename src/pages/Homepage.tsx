@@ -21,6 +21,7 @@ function Homepage() {
 
   return (
     <>
+      <div className="grain-overlay" aria-hidden />
       <Header />
       <main>
         <Hero />

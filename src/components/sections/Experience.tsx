@@ -11,16 +11,16 @@ function Experience() {
       id="experience"
       className="relative overflow-hidden border-t border-stone-200 px-6 py-48 lg:px-18"
       style={{
-        background: "linear-gradient(180deg, #f5f3ff 0%, #fafaf9 100%)",
+        background: "linear-gradient(180deg, #fdf1ea 0%, #f7f3ea 100%)",
       }}
     >
-      <DotGrid color="#7c3aed" opacity={0.08} spacing={28} />
+      <DotGrid color="#db5a24" opacity={0.06} spacing={28} />
 
       <ParallaxShape offset={-40} className="absolute -top-40 -left-50">
-        <GhostRing size={640} color="#7c3aed" opacity={0.07} />
+        <GhostRing size={640} color="#2f9fc6" opacity={0.08} />
       </ParallaxShape>
       <ParallaxShape offset={-20} className="absolute -top-15 -left-25">
-        <GhostRing size={400} color="#7c3aed" opacity={0.05} />
+        <GhostRing size={400} color="#db5a24" opacity={0.06} />
       </ParallaxShape>
 
       <div className="relative z-10 mx-auto max-w-7xl">

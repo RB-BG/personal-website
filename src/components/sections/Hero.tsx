@@ -1,52 +1,184 @@
 import { ArrowRight } from "lucide-react"
+import { type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef } from "react"
 
-import { DotGrid } from "@/components/decorative/DotGrid"
-import { GhostRing } from "@/components/decorative/GhostRing"
-import { GradientBlob } from "@/components/decorative/GradientBlob"
 import { FadeIn } from "@/components/motion/FadeIn"
-import { ParallaxShape } from "@/components/motion/ParallaxShape"
-import { Badge } from "@/components/ui/badge"
+import { useReducedMotion } from "@/hooks/useReducedMotion"
 
+/**
+ * Interactive warm/cool light field: the orange glow follows the cursor, the
+ * ice glow trails at the opposite corner, and the dot-grid lights up as a
+ * spotlight underneath. On touch / reduced-motion it drifts on its own (or
+ * rests). Positions are published as CSS custom properties the layers read.
+ */
 function Hero() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const magnetRef = useRef<HTMLAnchorElement>(null)
+  const reduced = useReducedMotion()
+
+  const setPos = useCallback((x: number, y: number) => {
+    const el = sectionRef.current
+    if (!el) return
+    el.style.setProperty("--mx", `${x}%`)
+    el.style.setProperty("--my", `${y}%`)
+    el.style.setProperty("--cx", `${100 - x}%`)
+    el.style.setProperty("--cy", `${100 - y}%`)
+  }, [])
+
+  useEffect(() => {
+    if (reduced) return
+    const el = sectionRef.current
+    if (!el) return
+
+    const canHover = window.matchMedia("(hover: hover)").matches
+    if (canHover) {
+      const onMove = (e: PointerEvent) => {
+        const b = el.getBoundingClientRect()
+        const x = ((e.clientX - b.left) / b.width) * 100
+        const y = ((e.clientY - b.top) / b.height) * 100
+        setPos(Math.max(-12, Math.min(112, x)), Math.max(-12, Math.min(112, y)))
+      }
+      window.addEventListener("pointermove", onMove, { passive: true })
+      return () => window.removeEventListener("pointermove", onMove)
+    }
+
+    // Touch / no-hover: gentle ambient drift.
+    let raf = 0
+    let t = 0
+    const loop = () => {
+      t += 0.005
+      setPos(50 + 38 * Math.cos(t), 48 + 30 * Math.sin(t * 1.25))
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [reduced, setPos])
+
+  // Magnetic primary button — nudges toward the cursor on hover.
+  const onMagnet = useCallback(
+    (e: ReactPointerEvent<HTMLAnchorElement>) => {
+      if (reduced) return
+      const el = magnetRef.current
+      if (!el) return
+      const b = el.getBoundingClientRect()
+      const dx = e.clientX - (b.left + b.width / 2)
+      const dy = e.clientY - (b.top + b.height / 2)
+      el.style.transform = `translate(${(dx * 0.18).toFixed(1)}px, ${(dy * 0.3 - 1).toFixed(1)}px)`
+    },
+    [reduced],
+  )
+  const resetMagnet = useCallback(() => {
+    if (magnetRef.current) magnetRef.current.style.transform = ""
+  }, [])
+
   return (
     <section
+      ref={sectionRef}
       id="top"
-      className="relative overflow-hidden px-6 pt-56 pb-44 lg:px-18"
+      className="relative flex min-h-[92vh] items-center overflow-hidden px-6 pt-48 pb-36 lg:px-18"
       style={{
         background:
-          "linear-gradient(150deg, #ede9fe 0%, #fafaf9 42%, #fef3c7 100%)",
-        minHeight: 920,
+          "linear-gradient(150deg, #f7e2d2 0%, #f7f3ea 50%, #dcecf1 100%)",
       }}
     >
-      <DotGrid color="#7c3aed" opacity={0.12} spacing={28} />
-
-      <ParallaxShape offset={-60} className="absolute -top-40 -right-40">
-        <GhostRing size={720} color="#7c3aed" opacity={0.1} />
-      </ParallaxShape>
-      <ParallaxShape offset={-40} className="absolute -top-16 -right-16">
-        <GhostRing size={460} color="#7c3aed" opacity={0.08} />
-      </ParallaxShape>
-      <ParallaxShape offset={-80} className="absolute -top-20 right-20">
-        <GradientBlob size={500} color="#a78bfa" opacity={0.22} />
-      </ParallaxShape>
-      <ParallaxShape offset={60} className="absolute -bottom-20 -left-20">
-        <GradientBlob size={480} color="#fde68a" opacity={0.35} />
-      </ParallaxShape>
+      {/* Spotlight dot-grid — masked to a soft circle under the cursor */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(var(--color-brand-500) 1.1px, transparent 1.1px)",
+          backgroundSize: "30px 30px",
+          WebkitMaskImage:
+            "radial-gradient(300px 300px at var(--mx,22%) var(--my,58%), #000 6%, transparent 64%)",
+          maskImage:
+            "radial-gradient(300px 300px at var(--mx,22%) var(--my,58%), #000 6%, transparent 64%)",
+          opacity: 0.22,
+        }}
+      />
+      {/* Warm glow — follows the cursor */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute rounded-full"
+        style={{
+          width: "min(52vw, 640px)",
+          aspectRatio: "1",
+          left: "var(--mx, 24%)",
+          top: "var(--my, 66%)",
+          transform: "translate(-50%, -50%)",
+          background:
+            "radial-gradient(closest-side, var(--color-brand-500), transparent 70%)",
+          opacity: 0.24,
+          filter: "blur(6px)",
+          transition: "left .22s ease-out, top .22s ease-out",
+        }}
+      />
+      {/* Cool glow — trails at the opposite corner */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute rounded-full"
+        style={{
+          width: "min(46vw, 560px)",
+          aspectRatio: "1",
+          left: "var(--cx, 78%)",
+          top: "var(--cy, 20%)",
+          transform: "translate(-50%, -50%)",
+          background:
+            "radial-gradient(closest-side, var(--color-ice-500), transparent 70%)",
+          opacity: 0.3,
+          transition: "left .5s ease-out, top .5s ease-out",
+        }}
+      />
+      {/* Thin static rings for depth */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-[16%] -right-[10%] aspect-square rounded-full border-[1.5px] border-ice-500/25"
+        style={{ width: "min(52vw, 640px)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-[3%] right-[3%] aspect-square rounded-full border-[1.5px] border-brand-500/15"
+        style={{ width: "min(34vw, 420px)" }}
+      />
 
       <div className="relative z-10 mx-auto w-full max-w-7xl">
         <FadeIn immediate delay={0.1} duration={0.9}>
-          <Badge variant="amber" className="mb-14">
-            <span className="inline-block size-[7px] rounded-full bg-amber-500" />
+          <span className="mb-14 inline-flex items-center gap-2.5 rounded-md border border-stone-200 bg-white/70 px-4 py-2 text-[13px] font-semibold text-stone-950 backdrop-blur-sm">
+            <span className="relative inline-flex size-[7px]">
+              <span className="absolute inset-0 rounded-full bg-ice-500" />
+              <span className="absolute inset-0 animate-ping rounded-full bg-ice-500 opacity-60" />
+            </span>
             Open to collaboration
-          </Badge>
+          </span>
         </FadeIn>
 
         <FadeIn immediate delay={0.25} duration={0.9}>
-          <h1 className="mb-10 max-w-[1200px] text-[clamp(56px,9.5vw,148px)] leading-[0.92] font-bold tracking-[-0.05em] text-stone-950">
+          <h1 className="mb-10 max-w-[1200px] text-[clamp(54px,9.4vw,146px)] leading-[0.92] font-semibold tracking-[-0.035em] text-stone-950">
             Product manager,
             <br />
-            <span className="bg-gradient-to-r from-brand-800 via-brand-600 to-brand-400 bg-clip-text text-transparent">
+            <span className="relative whitespace-nowrap text-brand-600">
               designer
+              <svg
+                aria-hidden
+                viewBox="0 0 300 12"
+                preserveAspectRatio="none"
+                className="absolute inset-x-0 -bottom-[0.14em] h-[0.16em] w-full overflow-visible"
+              >
+                <path
+                  d="M4 8 C 70 2, 150 2, 220 6 S 292 9, 296 5"
+                  className="fill-none stroke-ice-500"
+                  strokeWidth={7}
+                  strokeLinecap="round"
+                  style={
+                    reduced
+                      ? undefined
+                      : {
+                          strokeDasharray: 520,
+                          strokeDashoffset: 520,
+                          animation: "hero-underline .9s ease .9s forwards",
+                        }
+                  }
+                />
+              </svg>
             </span>{" "}
             &amp; builder.
           </h1>
@@ -63,15 +195,18 @@ function Hero() {
         <FadeIn immediate delay={0.55} duration={0.9}>
           <div className="flex flex-wrap items-center gap-4">
             <a
+              ref={magnetRef}
               href="#work"
-              className="inline-flex items-center gap-2.5 rounded-full bg-brand-800 px-9 py-5 text-base font-semibold text-white shadow-[0_10px_28px_rgba(91,33,182,0.28)] transition-all hover:bg-brand-700 hover:shadow-[0_12px_32px_rgba(91,33,182,0.36)]"
+              onPointerMove={onMagnet}
+              onPointerLeave={resetMagnet}
+              className="inline-flex items-center gap-2.5 rounded-[7px] bg-brand-600 px-9 py-5 text-base font-semibold text-white shadow-[0_12px_30px_-8px_rgba(219,90,36,0.55)] transition-[background,box-shadow,transform] duration-200 hover:bg-brand-700 hover:shadow-[0_16px_36px_-8px_rgba(219,90,36,0.6)]"
             >
               View selected work
               <ArrowRight className="size-[17px]" strokeWidth={2.5} />
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2.5 rounded-full border border-stone-950/10 bg-white/65 px-9 py-5 text-base font-medium text-stone-950 backdrop-blur-md transition-colors hover:bg-white/80"
+              className="inline-flex items-center gap-2.5 rounded-[7px] border border-ice-500/60 bg-white/60 px-9 py-5 text-base font-medium text-ice-700 backdrop-blur-md transition-colors hover:bg-ice-50/80"
             >
               Get in touch
             </a>
