@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Footer } from "@/components/layout/Footer"
 import { Header } from "@/components/layout/Header"
 import { Cursor } from "@/components/motion/Cursor"
+import { About } from "@/components/sections/About"
 import { CaseStudyDrawer } from "@/components/sections/CaseStudyDrawer"
 import { ImageCollage } from "@/components/sections/ImageCollage"
 import { Contact } from "@/components/sections/Contact"
@@ -29,6 +30,7 @@ function Homepage() {
         <Hero />
         <ScreenRail onOpenGallery={setGallerySlug} />
         <Ticker items={["Product", "Design", "Frontend", "AI", "UX research", "ERP", "Accessibility"]} tilt={-1.5} />
+        <About />
         <LogoWall />
         <WorkList
           onOpenCaseStudy={setActiveSlug}

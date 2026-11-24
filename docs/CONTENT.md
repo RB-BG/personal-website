@@ -98,6 +98,14 @@ The logo wall is the `partners` array in the same file:
 
 The text bands are `<Ticker items={[...]} />`. The cobalt band is in `src/pages/Homepage.tsx`, the white "Education • Boards" band is at the top of `Experience.tsx`. Props: `tone` (`"brand"` or `"light"`), `size` (`"lg"` or `"md"`), `reverse`, and `tilt` (degrees).
 
+## Editing the "About me" section
+
+Open `src/content/about.ts`. `aboutIntro` is the large lead paragraph, `aboutPoints` are the three cards (each has an `icon`: `expertise`, `experience` or `beyond`), and `aboutOutro` is the closing line next to the "Get in touch" button.
+
+## Updating the page title and social preview
+
+The `<title>`, meta description and Open Graph tags are in `index.html`. Keep the description under about 160 characters.
+
 ## Updating the hero copy
 
 Open `src/components/sections/Hero.tsx`. The headline, gradient span, subtitle, badge text and CTA labels are inline in the JSX. Keep the existing structure:

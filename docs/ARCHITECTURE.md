@@ -37,7 +37,7 @@ The codebase splits components into four layers based on responsibility. Lower l
 ```
 pages/        Homepage
    ▲
-sections/     Hero, ScreenRail, Ticker, LogoWall, WorkList, Experience, Contact,
+sections/     Hero, ScreenRail, Ticker, About, LogoWall, WorkList, Experience, Contact,
               CaseStudyDrawer, ImageCollage
    ▲
 ui/           Button, Badge        (interactive primitives)
