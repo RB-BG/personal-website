@@ -16,7 +16,7 @@ export const experience: ReadonlyArray<ExperienceEntry> = [
     logo: LOGOS.utrecht,
     role: "MSc Human-Computer Interaction",
     description:
-      "Research into usability, accessibility and interaction design. Thesis on AI-driven personalised learning.",
+      "Research into usability, accessibility and interaction design. Thesis on an AI tutor for personalised learning in games, researched at &Ranj.",
   },
   {
     period: "2018 → 2022",

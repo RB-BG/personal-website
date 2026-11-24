@@ -92,7 +92,7 @@ The logo wall is the `partners` array in the same file:
 
 `note` slides up on hover. Only write facts that are also in your project content.
 
-`long-covid-toolkit.svg` is a broken auto-trace (it renders as a dark square), so it is not used. Replace it with a clean SVG to show that logo.
+`long-covid-toolkit.svg` currently holds only the wordmark (the icon was an embedded PNG). Drop in the full SVG to show the icon as well.
 
 ## Editing the tickers
 

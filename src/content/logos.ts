@@ -4,6 +4,7 @@ import dubocalc from "@/assets/logos/logo.svg"
 import execut from "@/assets/logos/execut.svg"
 import frankEnergie from "@/assets/logos/frank-energie.svg"
 import hku from "@/assets/logos/hku.svg"
+import longCovidToolkit from "@/assets/logos/long-covid-toolkit.svg"
 import netcompany from "@/assets/logos/netcompany.svg"
 import ranj from "@/assets/logos/ranj.svg"
 import sniptech from "@/assets/logos/sniptech.svg"
@@ -20,6 +21,7 @@ export const LOGOS = {
   execut,
   frankEnergie,
   hku,
+  longCovidToolkit,
   netcompany,
   ranj,
   sniptech,
@@ -44,9 +46,9 @@ export const partners: ReadonlyArray<Partner> = [
   { name: "DuboCalc", logo: LOGOS.dubocalc, note: "Rijkswaterstaat · via Netcompany" },
   { name: "Vervangingsfonds Participatiefonds", logo: LOGOS.vfpf, note: "Pension portal · via Netcompany" },
   { name: "Studielink", logo: LOGOS.studielink, note: "Every Dutch university · via Netcompany" },
-  { name: "&Ranj", logo: LOGOS.ranj, note: "AI Game Research · 2023 – 2024" },
-  { name: "Sniptech", logo: LOGOS.sniptech },
+  { name: "&Ranj", logo: LOGOS.ranj, note: "MSc thesis research · 2023 – 2024" },
+  { name: "Sniptech", logo: LOGOS.sniptech, note: "Relationship Support Manager · 2021 – 2023" },
   { name: "Co-Teach", logo: LOGOS.coTeach },
-  { name: "Frank Energie", logo: LOGOS.frankEnergie },
-  { name: "Long Covid Toolkit", note: "Volunteer · 2023" },
+  { name: "Frank Energie", logo: LOGOS.frankEnergie, note: "Client support · via Sniptech" },
+  { name: "Long Covid Toolkit", logo: LOGOS.longCovidToolkit, note: "Volunteer · 2023" },
 ]
