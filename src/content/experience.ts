@@ -16,7 +16,7 @@ export const experience: ReadonlyArray<ExperienceEntry> = [
     logo: LOGOS.utrecht,
     role: "MSc Human-Computer Interaction",
     description:
-      "Research into usability, accessibility and interaction design. Thesis on AI-driven personalised learning.",
+      "Research into usability, accessibility and interaction design. Thesis on an AI tutor for personalised learning in games, researched at &Ranj.",
   },
   {
     period: "2018 → 2022",
@@ -57,5 +57,29 @@ export const experience: ReadonlyArray<ExperienceEntry> = [
     role: "Student Ambassador HCI",
     description:
       "Sharing experiences and insights with prospective HCI masters students, helping them navigate their academic journey.",
+  },
+  {
+    period: "2023 → 2024",
+    institution: "Co-Teach Informatica",
+    logo: LOGOS.coTeach,
+    role: "Assistant ICT Teacher",
+    description:
+      "Supporting high school students in computer science: reviewing assignments, giving guidance and creating teaching materials.",
+  },
+  {
+    period: "2021 → 2022",
+    institution: "Universiteit Utrecht",
+    logo: LOGOS.utrecht,
+    role: "Student Tutor Information Science",
+    description:
+      "Helping first-year information and computing science students settle in and find their way in their new studies.",
+  },
+  {
+    period: "2021",
+    institution: "Universiteit Utrecht",
+    logo: LOGOS.utrecht,
+    role: "Teaching Assistant UE/UX Design",
+    description:
+      "Helping information science students with their assignments and grading them for the course Usability Engineering and User Experience.",
   },
 ]

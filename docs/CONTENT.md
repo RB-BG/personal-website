@@ -14,7 +14,7 @@ Open `src/content/projects.ts`. Each project is an object in the `projects` arra
   tagline: "One line about the work.",               // row subtitle
   disciplines: ["Product", "Build"],                 // filter chips: Product | Design | Build | Research
   company: "Company Name",                           // shown in the row title + drawer
-  period: "jan 2025 – heden",                        // shown top-left in the row + drawer
+  period: "Jan 2025 – now",                          // English, e.g. "Oct 2024 – Mar 2025"; shown in the row + drawer
   badge: "Optional badge",                           // optional label, omit for none
   title: "Headline that describes the work.",        // drawer heading
   body: "One paragraph of context. HTML entities like &mdash; and <strong>...</strong> work here.",
@@ -92,11 +92,19 @@ The logo wall is the `partners` array in the same file:
 
 `note` slides up on hover. Only write facts that are also in your project content.
 
-`long-covid-toolkit.svg` is a broken auto-trace (it renders as a dark square), so it is not used. Replace it with a clean SVG to show that logo.
+`long-covid-toolkit.svg` currently holds only the wordmark (the icon was an embedded PNG). Drop in the full SVG to show the icon as well.
 
 ## Editing the tickers
 
 The text bands are `<Ticker items={[...]} />`. The cobalt band is in `src/pages/Homepage.tsx`, the white "Education • Boards" band is at the top of `Experience.tsx`. Props: `tone` (`"brand"` or `"light"`), `size` (`"lg"` or `"md"`), `reverse`, and `tilt` (degrees).
+
+## Editing the "About me" section
+
+Open `src/content/about.ts`. `aboutIntro` is the large lead paragraph, `aboutPoints` are the three cards (each has an `icon`: `expertise`, `experience` or `beyond`), and `aboutOutro` is the closing line next to the "Get in touch" button.
+
+## Updating the page title and social preview
+
+The `<title>`, meta description and Open Graph tags are in `index.html`. Keep the description under about 160 characters.
 
 ## Updating the hero copy
 

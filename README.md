@@ -47,11 +47,12 @@ src/
 ├── components/
 │   ├── ui/                      # shadcn-style primitives (Button, Badge)
 │   ├── layout/                  # Header, Footer
-│   ├── sections/                # Hero, ScreenRail, Ticker, LogoWall, WorkList, Experience, Contact,
+│   ├── sections/                # Hero, ScreenRail, Ticker, About, LogoWall, WorkList, Experience, Contact,
 │   │                            # CaseStudyDrawer, ImageCollage
 │   └── motion/                  # FadeIn, Cursor (framer-motion wrappers)
 ├── content/
 │   ├── projects.ts              # data array driving the 4 project sections + case study drawers + galleries
+│   ├── about.ts                 # "About me" copy (intro, three points, outro)
 │   ├── experience.ts            # data array driving the experience grid cards
 │   └── logos.ts                 # every logo URL + the logo-wall entries
 ├── hooks/

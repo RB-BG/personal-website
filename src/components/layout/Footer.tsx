@@ -13,6 +13,7 @@ function Footer() {
           &copy; 2026 Ruben Baggen &mdash; Utrecht, NL
         </p>
         <nav className="flex gap-6 text-sm font-medium text-white/50">
+          <a href="#about" className="hover:text-white">About</a>
           <a href="#work" className="hover:text-white">Work</a>
           <a href="#experience" className="hover:text-white">Experience</a>
           <a href="#contact" className="hover:text-white">Contact</a>

@@ -4,9 +4,10 @@ import { ArrowRight } from "lucide-react"
 import { useActiveSection } from "@/hooks/useActiveSection"
 import { cn } from "@/lib/utils"
 
-const SECTIONS = ["work", "experience", "contact"] as const
+const SECTIONS = ["about", "work", "experience", "contact"] as const
 
 const NAV_ITEMS: ReadonlyArray<{ id: (typeof SECTIONS)[number]; label: string }> = [
+  { id: "about", label: "About" },
   { id: "work", label: "Work" },
   { id: "experience", label: "Experience" },
   { id: "contact", label: "Contact" },
