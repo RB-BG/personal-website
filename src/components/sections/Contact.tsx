@@ -16,10 +16,10 @@ function Contact() {
         <GradientBlob size={600} color="#2f9fc6" opacity={0.12} />
       </ParallaxShape>
       <ParallaxShape offset={-20} className="absolute top-0 right-0">
-        <GhostRing size={380} color="#db5a24" opacity={0.1} />
+        <GhostRing size={380} color="#2650ff" opacity={0.1} />
       </ParallaxShape>
       <ParallaxShape offset={40} className="absolute -bottom-20 -left-20">
-        <GradientBlob size={400} color="#db5a24" opacity={0.16} />
+        <GradientBlob size={400} color="#2650ff" opacity={0.16} />
       </ParallaxShape>
 
       <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-28 lg:grid-cols-[1fr_1.2fr]">
@@ -28,7 +28,7 @@ function Contact() {
             className="relative aspect-square overflow-hidden rounded-[28px]"
             style={{
               background:
-                "linear-gradient(155deg, #e77f47 0%, #db5a24 46%, #2f9fc6 100%)",
+                "linear-gradient(155deg, #4a6dff 0%, #2650ff 46%, #2f9fc6 100%)",
             }}
           >
             <DotGrid color="#ffffff" opacity={0.18} spacing={24} />

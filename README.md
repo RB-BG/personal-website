@@ -1,6 +1,6 @@
 # Ruben Baggen — Personal Website
 
-Personal portfolio for Ruben Baggen (Product Manager & Designer, Brand Boekhouders). Built as a single long-scroll homepage with anchor navigation, scroll-triggered animations, and a clean, playful violet + amber design.
+Personal portfolio for Ruben Baggen (Product Manager & Designer, Brand Boekhouders). Built as a single long-scroll homepage with anchor navigation, scroll-triggered animations, and a cobalt-and-ink design with an agenda-style work list.
 
 ## Stack
 
@@ -12,7 +12,7 @@ Personal portfolio for Ruben Baggen (Product Manager & Designer, Brand Boekhoude
 | Component primitives | `@base-ui/react` (headless) + shadcn-style wrappers in `src/components/ui` |
 | Variant system | `class-variance-authority` (CVA) |
 | Icons | `lucide-react` (brand icons inlined as SVG because Lucide 1.x dropped trademarked icons) |
-| Animation | `framer-motion` for scroll-reveals, parallax shapes, overlays and masonry FLIP, CSS keyframes for the logo marquee |
+| Animation | `framer-motion` for scroll-reveals, parallax shapes, overlays and masonry FLIP, CSS keyframes for the skills ticker |
 | Font | `@fontsource-variable/geist` (loaded in `src/index.css`) |
 | Path alias | `@/*` resolves to `./src/*` |
 
@@ -47,7 +47,7 @@ src/
 ├── components/
 │   ├── ui/                      # shadcn-style primitives (Button, Badge)
 │   ├── layout/                  # Header, Footer
-│   ├── sections/                # Hero, LogoMarquee, WorkIntro, ProjectSection, Experience, Contact,
+│   ├── sections/                # Hero, Ticker, WorkList, Experience, Contact,
 │   │                            # CaseStudyDrawer, ImageCollage
 │   ├── decorative/              # GradientBlob, GhostRing, DotGrid (pure visual)
 │   └── motion/                  # FadeIn, ParallaxShape (framer-motion wrappers)
@@ -66,7 +66,7 @@ src/
 ## Documentation
 
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md): why the codebase is shaped this way (design system, motion strategy, anchor scrolling, overlay patterns, masonry layout algorithm).
-- [docs/CONTENT.md](./docs/CONTENT.md): how to add or edit a project, case study, gallery images, education entry, or company name in the marquee without touching JSX.
+- [docs/CONTENT.md](./docs/CONTENT.md): how to add or edit a project, case study, gallery images, education entry, or ticker word in the marquee without touching JSX.
 
 ## Roadmap
 

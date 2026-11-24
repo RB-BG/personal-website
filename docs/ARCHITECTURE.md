@@ -10,11 +10,10 @@ All brand colors live in the `@theme inline` block of `src/index.css` as Tailwin
 
 | Token family | Range | Use |
 |---|---|---|
-| `brand-*` | 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950 | Primary CTAs, headings accent, the "designer" gradient text, education cards |
-| `amber-*` | 50, 100, 400, 500, 600, 700, 900 | "Open to collaboration" badge, &Ranj project, HKU card |
-| `sky-*` | 50, 200, 300, 500, 700, 900 | Netcompany project, Sticky card |
-| `pink-*` | 100, 300, 500, 700, 900 | Long Covid project, exec(ut) card |
-| `stone-*` | 50, 100, 150 | Warm white backgrounds (added on top of Tailwind's defaults so the design matches Figma exactly) |
+| `brand-*` | 50 to 950 | **Cobalt** (`brand-600` = `#2650ff`). Primary CTAs, slashes and labels in the work list, the ticker band, links |
+| `ice-*` | 50 to 900 | Cool secondary accent: hero glow, "open to collaboration" dot, contact gradient |
+| `stone-*` | 50 to 950 | Cool ink neutrals. `stone-50` (`#f2f5fb`) is the page ground, `stone-950` (`#0a1124`) is the ink used for text and rules |
+| `amber-*`, `sky-*`, `pink-*` | various | Per-item colours in the experience cards |
 
 The pre-existing OKLch neutral tokens (`--background`, `--foreground`, `--primary`, etc.) are left in place but mostly unused by the homepage. They stay so the existing `Button` component keeps working and so dark mode can be added later without rewriting tokens.
 
@@ -24,7 +23,7 @@ The site uses Geist Variable, loaded via `@fontsource-variable/geist` and applie
 
 ### Spacing rhythm
 
-Sections use generous vertical padding to match the volt.io reference:
+Sections use generous vertical padding:
 
 - Hero: `pt-56 pb-44` (224px top, 176px bottom)
 - Standard sections: `py-40` to `py-48` (160 to 192px)
@@ -38,7 +37,7 @@ The codebase splits components into four layers based on responsibility. Lower l
 ```
 pages/        Homepage
    ▲
-sections/     Hero, LogoMarquee, WorkIntro, ProjectSection, Experience, Contact,
+sections/     Hero, Ticker, WorkList, Experience, Contact,
               CaseStudyDrawer, ImageCollage
    ▲
 ui/           Button, Badge        (interactive primitives)
@@ -71,7 +70,7 @@ The `useReducedMotion()` hook is a thin wrapper around framer-motion's built-in 
 
 - `FadeIn` still fades but does not translate (no `y` offset).
 - `ParallaxShape` returns its child untouched (no transform applied).
-- The marquee animation is disabled via a `@media (prefers-reduced-motion: reduce)` query in `LogoMarquee.tsx`.
+- The marquee animation is disabled via a `@media (prefers-reduced-motion: reduce)` query in `Ticker.tsx`.
 
 Always test new motion with the OS-level setting enabled (Windows: Settings → Accessibility → Visual effects → Animation effects off).
 
@@ -92,18 +91,13 @@ The header is `fixed` and uses `useScroll` to interpolate two motion values:
 - `background` interpolates from `rgba(255,255,255,0)` to `rgba(255,255,255,0.85)` over the first 80px of scroll. Backdrop-blur is always on, so once any opacity exists, the blur takes effect.
 - `borderOpacity` interpolates 0 to 1 over the same range, fading in the bottom hairline border.
 
-This gives the volt.io-style "lift off the hero, settle into a clear nav" effect without any class-toggling.
+This gives the "lift off the hero, settle into a clear nav" effect without any class-toggling.
 
-## ProjectSection and content-driven sections
+## WorkList and content-driven sections
 
-`ProjectSection.tsx` is a single component that renders any project from `content/projects.ts`. It handles:
+`WorkList.tsx` renders every project from `content/projects.ts` as a row in an agenda-style list: period and disciplines on the left, `SHORT TITLE / COMPANY` as the headline, a tagline with the role, tag chips, and two actions ("View screens" opens the gallery, "Read case study" opens the drawer). A row of filter chips (All / Product / Design / Build / Research) filters on each project's `disciplines`; framer-motion's `layout` + `AnimatePresence` animate the list when filtering.
 
-- Alternating layout (image left vs right) via the `imgLeft` boolean.
-- Per-project gradient on the image placeholder via the `gradient` object.
-- Per-project accent color via Tailwind class strings (`text-brand-600`, `text-sky-500`, etc.).
-- Per-project blob color for the parallax decoration via a hex string.
-
-This pattern means all four projects share one component. To add a fifth project, you only edit `content/projects.ts`. See [CONTENT.md](./CONTENT.md).
+Adding a project means editing `content/projects.ts` only. See [CONTENT.md](./CONTENT.md).
 
 `Experience.tsx` follows the same pattern with `content/experience.ts` and the `ExperienceCard` internal component.
 
@@ -145,11 +139,9 @@ Placeholders have no real image, so both libraries are given a custom render fun
 
 `react-photo-album` measures its container with a `ResizeObserver` and renders nothing until the width is known. `defaultContainerWidth={860}` gives it a sensible first-paint guess (matching the overlay's max width) so tiles appear immediately instead of after a measurement tick.
 
-## CSS-only marquee
+## CSS-only ticker
 
-The logo marquee uses framer-motion nowhere. A pure CSS keyframe animates a `translateX(0)` to `translateX(-50%)` loop on a row that duplicates the company list. The `.group:hover .marquee-track { animation-play-state: paused }` rule pauses on hover. Reduced motion disables the animation.
-
-We chose this over framer-motion because the marquee runs continuously (no scroll-bound logic) and CSS handles infinite loops more efficiently than a React-driven motion value.
+The skills ticker under the hero uses framer-motion nowhere. A pure CSS keyframe animates a `translateX(0)` to `translateX(-50%)` loop on a row that repeats the topic list four times. Reduced motion disables the animation. We chose CSS over framer-motion because the ticker runs continuously (no scroll-bound logic).
 
 ## Decisions worth remembering
 

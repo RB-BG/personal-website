@@ -4,32 +4,31 @@ Most content updates do not require touching JSX. Use this guide.
 
 ## Adding or editing a project
 
-Open `src/content/projects.ts`. Each project is an object in the `projects` array. To add a fifth project, append a new object. To edit, change the fields in place.
+Open `src/content/projects.ts`. Each project is an object in the `projects` array and renders one row in the "Selected work" list (`WorkList.tsx`), plus its case study drawer and gallery. To add a project, append a new object. To edit, change the fields in place.
 
 ```ts
 {
   slug: "my-new-project",                            // url-safe id, used as the React key
-  company: "Company Name",                           // shown in the eyebrow + page
-  period: "jan 2025 – heden",                        // shown in the eyebrow
-  badge: "Optional badge",                           // pill on the image card, omit for none
-  title: "Headline that describes the work.",        // h3 in the section
+  shortTitle: "Short name",                          // lead of the row title, shown before "/ Company"
+  role: "Your role",                                 // shown after the tagline
+  tagline: "One line about the work.",               // row subtitle
+  disciplines: ["Product", "Build"],                 // filter chips: Product | Design | Build | Research
+  company: "Company Name",                           // shown in the row title + drawer
+  period: "jan 2025 – heden",                        // shown top-left in the row + drawer
+  badge: "Optional badge",                           // optional label, omit for none
+  title: "Headline that describes the work.",        // drawer heading
   body: "One paragraph of context. HTML entities like &mdash; and <strong>...</strong> work here.",
-  tags: ["Tag 1", "Tag 2", "Tag 3"],                 // first tag gets the brand gradient, rest are neutral
-  gradient: { from: "#hex", via: "#hex", to: "#hex" },  // image placeholder + drawer header gradient
-  accentClass: "text-brand-600",                     // eyebrow + link text colour (Tailwind class)
-  blobColor: "#7c3aed",                              // hex used for the decorative parallax blob behind the section
-  bgClass: "bg-stone-50",                            // section background colour (Tailwind class)
-  imgLeft: true,                                     // true = image left, false = image right (also controls drawer slide direction)
-  href: "#",                                         // will become "/work/my-new-project" in Phase 3
+  tags: ["Tag 1", "Tag 2", "Tag 3"],                 // first four are shown as chips in the row
+  gradient: { from: "#hex", via: "#hex", to: "#hex" },  // drawer header + gallery placeholder gradient
+  blobColor: "#2650ff",                              // hex used for the drawer accent dot
+  imgLeft: true,                                     // controls the drawer slide direction (left or right)
   caseStudy: {
     intro: "One paragraph that opens the drawer.",
     sections: [
       { heading: "Section heading", body: "One or two paragraphs." },
-      // add more sections as needed
     ],
     outcomes: [
-      "One concrete result per bullet",
-      // aim for 3 to 5 outcomes
+      "One concrete result per bullet",                // aim for 3 to 5 outcomes
     ],
   },
 }
@@ -37,10 +36,10 @@ Open `src/content/projects.ts`. Each project is an object in the `projects` arra
 
 **Rules of thumb:**
 
-- Alternate `imgLeft` and `bgClass` between projects so the page reads as zebra-striped (`stone-50` and `white` alternate).
-- Pick `accentClass` and `blobColor` from the same colour family (e.g. `text-sky-500` with `#0284c7`).
-- Keep `body` to two or three sentences. Long copy breaks the rhythm.
-- The first tag should be the project's defining role or domain. It gets visual emphasis through the brand-gradient background.
+- Keep `tagline` to one short line. The row stays scannable that way.
+- Pick `disciplines` carefully: a project appears under every filter chip you list.
+- The first four `tags` are shown in the row, so put the most important ones first.
+- `role` should say what you actually did, in the words of the case study.
 
 ## Editing the image gallery (ImageCollage)
 
@@ -82,26 +81,20 @@ Open `src/content/experience.ts`. Each entry renders a card in the Experience gr
 
 The grid renders three cards per row on desktop, two on tablet, one on mobile, in the order the array defines.
 
-## Editing the company marquee
+## Editing the skills ticker
 
-Open `src/components/sections/LogoMarquee.tsx`. The `COMPANIES` array near the top of the file is the source of truth.
+Open `src/components/sections/Ticker.tsx`. The `TOPICS` array near the top is the source of truth. The words loop in a CSS-only band under the hero.
 
 ```ts
-const COMPANIES = [
-  "Brand Boekhouders",
-  "Netcompany",
-  // add or reorder here
-] as const
+const TOPICS = ["Product", "Design", "Frontend" /* add or reorder here */] as const
 ```
-
-Currently the marquee renders text labels in light grey. When real logo SVGs are ready, replace the `<span>` inside the map with `<img src={...} />` and update the array to point at logo modules.
 
 ## Updating the hero copy
 
 Open `src/components/sections/Hero.tsx`. The headline, gradient span, subtitle, badge text and CTA labels are inline in the JSX. Keep the existing structure:
 
 - The badge stays under 30 characters or it wraps.
-- The headline is set to scale fluidly via `clamp(56px, 9.5vw, 148px)`. Headlines longer than two lines break the visual balance.
+- The headline is set to scale fluidly via `clamp(54px, 9.4vw, 146px)`. Headlines longer than two lines break the visual balance.
 - The subtitle has `max-w-[620px]`. Aim for around 30 to 40 words.
 
 ## Updating contact details

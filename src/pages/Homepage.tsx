@@ -7,9 +7,8 @@ import { ImageCollage } from "@/components/sections/ImageCollage"
 import { Contact } from "@/components/sections/Contact"
 import { Experience } from "@/components/sections/Experience"
 import { Hero } from "@/components/sections/Hero"
-import { LogoMarquee } from "@/components/sections/LogoMarquee"
-import { ProjectSection } from "@/components/sections/ProjectSection"
-import { WorkIntro } from "@/components/sections/WorkIntro"
+import { Ticker } from "@/components/sections/Ticker"
+import { WorkList } from "@/components/sections/WorkList"
 import { projects } from "@/content/projects"
 
 function Homepage() {
@@ -21,22 +20,14 @@ function Homepage() {
 
   return (
     <>
-      <div className="grain-overlay" aria-hidden />
       <Header />
       <main>
         <Hero />
-        <LogoMarquee />
-        <section id="work">
-          <WorkIntro />
-          {projects.map((project) => (
-            <ProjectSection
-              key={project.slug}
-              project={project}
-              onOpenCaseStudy={() => setActiveSlug(project.slug)}
-              onOpenGallery={() => setGallerySlug(project.slug)}
-            />
-          ))}
-        </section>
+        <Ticker />
+        <WorkList
+          onOpenCaseStudy={setActiveSlug}
+          onOpenGallery={setGallerySlug}
+        />
         <Experience />
         <Contact />
       </main>

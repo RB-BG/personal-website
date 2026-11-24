@@ -18,7 +18,7 @@ function Header() {
   const background = useTransform(
     scrollY,
     [0, 80],
-    ["rgba(247, 243, 234, 0)", "rgba(247, 243, 234, 0.85)"],
+    ["rgba(242, 245, 251, 0)", "rgba(242, 245, 251, 0.85)"],
   )
   const borderOpacity = useTransform(scrollY, [0, 80], [0, 1])
   const active = useActiveSection(SECTIONS)

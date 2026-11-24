@@ -77,7 +77,7 @@ function Hero() {
       className="relative flex min-h-[92vh] items-center overflow-hidden px-6 pt-48 pb-36 lg:px-18"
       style={{
         background:
-          "linear-gradient(150deg, #f7e2d2 0%, #f7f3ea 50%, #dcecf1 100%)",
+          "linear-gradient(150deg, #dfe6ff 0%, #f2f5fb 50%, #dff0f7 100%)",
       }}
     >
       {/* Spotlight dot-grid — masked to a soft circle under the cursor */}
@@ -199,7 +199,7 @@ function Hero() {
               href="#work"
               onPointerMove={onMagnet}
               onPointerLeave={resetMagnet}
-              className="inline-flex items-center gap-2.5 rounded-[7px] bg-brand-600 px-9 py-5 text-base font-semibold text-white shadow-[0_12px_30px_-8px_rgba(219,90,36,0.55)] transition-[background,box-shadow,transform] duration-200 hover:bg-brand-700 hover:shadow-[0_16px_36px_-8px_rgba(219,90,36,0.6)]"
+              className="inline-flex items-center gap-2.5 rounded-[7px] bg-brand-600 px-9 py-5 text-base font-semibold text-white shadow-[0_12px_30px_-8px_rgba(38,80,255,0.5)] transition-[background,box-shadow,transform] duration-200 hover:bg-brand-700 hover:shadow-[0_16px_36px_-8px_rgba(38,80,255,0.55)]"
             >
               View selected work
               <ArrowRight className="size-[17px]" strokeWidth={2.5} />
