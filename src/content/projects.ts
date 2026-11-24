@@ -107,8 +107,8 @@ export const projects: ReadonlyArray<Project> = [
     ],
     period: "okt 2024 – maart 2025",
     title: "Interface consultant on three public-sector platforms.",
-    body: "Interface designer and business analyst in agile scrum teams for government clients: DuboCalc (Rijkswaterstaat), the VFPF pension portal, and Studielink, used by every Dutch university.",
-    tags: ["UX Design", "React", "WCAG 2.0", "Government", "Prototyping"],
+    body: "Interface designer and UX specialist in scrum teams for public-sector clients: usability, accessibility and customer journeys in the analysis, low- and high-fidelity prototypes, help with the React front-end, and visual QA in testing. Clients: DuboCalc (Rijkswaterstaat), the VFPF pension portal and Studielink.",
+    tags: ["UX Design", "Prototyping", "React", "WCAG 2.0", "Customer journeys"],
     gradient: { from: "#0c4a6e", via: "#0284c7", to: "#38bdf8" },
     blobColor: "#0284c7",
     imgLeft: false,
@@ -121,7 +121,7 @@ export const projects: ReadonlyArray<Project> = [
     ],
     caseStudy: {
       intro:
-        "At Netcompany I worked as an interface consultant across three scrum teams, each building a digital platform for a Dutch public-sector client. Every project came with its own stakeholders and constraints, and with WCAG 2.0 AA as the accessibility target.",
+        "At Netcompany I worked as an interface consultant across three scrum teams, each building a digital platform for a Dutch public-sector client. Every project came with its own stakeholders and constraints, and with WCAG 2.0 AA as the accessibility target. Besides design, I helped implement the front-end in React and checked builds for visual front-end bugs during testing.",
       sections: [
         {
           heading: "DuboCalc — Rijkswaterstaat",
@@ -138,7 +138,8 @@ export const projects: ReadonlyArray<Project> = [
       ],
       outcomes: [
         "Interface designs for DuboCalc and VFPF, with WCAG 2.0 AA as the target",
-        "Figma prototypes handed off to the development teams",
+        "Low- and high-fidelity prototypes that guided refinement and development",
+        "Helped build the React front-end and caught visual bugs during testing",
         "Specified the reworked phone-number verification flow for international students on Studielink",
       ],
     },
@@ -154,7 +155,7 @@ export const projects: ReadonlyArray<Project> = [
     period: "nov 2023 – aug 2024",
     badge: "MSc thesis",
     title: "AI-driven tutor for personalised learning in games.",
-    body: "My MSc thesis research, done as an intern at &Ranj: designing an AI tutor that gives players personalised feedback, independent of one specific game's mechanics.",
+    body: "My MSc thesis research, done as an intern at &Ranj: an AI tutor that gives players tailored feedback and reflection, independent of one specific game's mechanics.",
     tags: ["AI Research", "Game design", "Learning science", "UX Research"],
     gradient: { from: "#78350f", via: "#d97706", to: "#fde68a" },
     blobColor: "#d97706",
@@ -193,7 +194,7 @@ export const projects: ReadonlyArray<Project> = [
     logo: LOGOS.longCovidToolkit,
     period: "Volunteer · mei – sep 2023",
     title: "A toolkit empowering people to live well with Long Covid.",
-    body: "Pro-bono design and project specialist in the start-up phase of a public health platform that aimed to combine scientific evidence with patient and clinician experience. I worked on the website design and the project requirements.",
+    body: "Pro-bono design and project specialist in the start-up phase of a public health platform that aimed to combine scientific evidence with patient and clinician experience. I supported the project manager with website design, project requirements, marketing, sponsor search and community management.",
     tags: ["Volunteer", "UX Design", "Healthcare", "Project management"],
     gradient: { from: "#831843", via: "#ec4899", to: "#f0abfc" },
     blobColor: "#ec4899",
@@ -216,13 +217,14 @@ export const projects: ReadonlyArray<Project> = [
           body: "I tried to ground the design in what patients need rather than in assumptions. What information do you look for on a bad day? What makes you feel more in control? That pointed to short, actionable content over long clinical summaries, which shaped the content structure.",
         },
         {
-          heading: "Design and requirements",
-          body: "I worked on the website design, from information architecture to UI, and wrote the project requirements for the volunteers building it.",
+          heading: "Design, requirements and more",
+          body: "I worked on the website design, from information architecture to UI, and on the project requirements. Next to that I helped with marketing, the search for sponsors and community management.",
         },
       ],
       outcomes: [
         "Website design and information architecture for the start-up phase",
-        "Project requirements written for the volunteer build team",
+        "Project requirements written for the build",
+        "Support on marketing, sponsor search and community management",
       ],
     },
   },
