@@ -14,7 +14,7 @@ Open `src/content/projects.ts`. Each project is an object in the `projects` arra
   tagline: "One line about the work.",               // row subtitle
   disciplines: ["Product", "Build"],                 // filter chips: Product | Design | Build | Research
   company: "Company Name",                           // shown in the row title + drawer
-  period: "jan 2025 – heden",                        // shown top-left in the row + drawer
+  period: "Jan 2025 – now",                          // English, e.g. "Oct 2024 – Mar 2025"; shown in the row + drawer
   badge: "Optional badge",                           // optional label, omit for none
   title: "Headline that describes the work.",        // drawer heading
   body: "One paragraph of context. HTML entities like &mdash; and <strong>...</strong> work here.",

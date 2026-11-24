@@ -50,5 +50,5 @@ export const partners: ReadonlyArray<Partner> = [
   { name: "Sniptech", logo: LOGOS.sniptech, note: "Relationship Support Manager · 2021 – 2023" },
   { name: "Co-Teach", logo: LOGOS.coTeach, note: "Assistant ICT teacher · 2023 – 2024" },
   { name: "Frank Energie", logo: LOGOS.frankEnergie, note: "Client support · via Sniptech" },
-  { name: "Long Covid Toolkit", logo: LOGOS.longCovidToolkit, note: "Volunteer · 2023" },
+  { name: "Long Covid Toolkit", logo: LOGOS.longCovidToolkit, note: "Freelance, then volunteer · 2023" },
 ]
