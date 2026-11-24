@@ -73,35 +73,44 @@ Open `src/content/experience.ts`. Each entry renders a card in the Experience gr
   institution: "Universiteit Utrecht",               // bold institution name
   role: "MSc Human-Computer Interaction",            // role line
   description: "One or two sentence summary.",       // body text
-  accentClass: "text-brand-600",                     // eyebrow colour (Tailwind class)
-  bar: ["#5b21b6", "#a78bfa"],                       // gradient hex pair for the top bar
-  ringColor: "#7c3aed",                              // hex for the corner ghost-ring
+  logo: LOGOS.utrecht,                               // institution logo, see content/logos.ts
 },
 ```
 
-The grid renders three cards per row on desktop, two on tablet, one on mobile, in the order the array defines.
+The grid renders three cards per row on desktop (middle column dropped down), two on tablet, one on mobile, in the order the array defines.
 
-## Editing the skills ticker
+## Editing logos and the logo wall
 
-Open `src/components/sections/Ticker.tsx`. The `TOPICS` array near the top is the source of truth. The words loop in a CSS-only band under the hero.
+All logos are SVGs in `src/assets/logos/`. Register a new one in the `LOGOS` map in `src/content/logos.ts`, then use it anywhere: a project's `logo` or `clients`, an education card's `logo`, or the logo wall.
+
+The logo wall is the `partners` array in the same file:
 
 ```ts
-const TOPICS = ["Product", "Design", "Frontend" /* add or reorder here */] as const
+{ name: "Netcompany", logo: LOGOS.netcompany, note: "Interface consultant · 2024 – 2025" },
+{ name: "Long Covid Toolkit", note: "Volunteer · 2023" },   // no logo → name is shown as a wordmark
 ```
+
+`note` slides up on hover. Only write facts that are also in your project content.
+
+`long-covid-toolkit.svg` is a broken auto-trace (it renders as a dark square), so it is not used. Replace it with a clean SVG to show that logo.
+
+## Editing the tickers
+
+The text bands are `<Ticker items={[...]} />`. The cobalt band is in `src/pages/Homepage.tsx`, the white "Education • Boards" band is at the top of `Experience.tsx`. Props: `tone` (`"brand"` or `"light"`), `size` (`"lg"` or `"md"`), `reverse`, and `tilt` (degrees).
 
 ## Updating the hero copy
 
 Open `src/components/sections/Hero.tsx`. The headline, gradient span, subtitle, badge text and CTA labels are inline in the JSX. Keep the existing structure:
 
 - The badge stays under 30 characters or it wraps.
-- The headline is set to scale fluidly via `clamp(54px, 9.4vw, 146px)`. Headlines longer than two lines break the visual balance.
+- The headline uses `font-display` and scales via `clamp(60px, 11.5vw, 180px)`. Keep it to four short lines.
 - The subtitle has `max-w-[620px]`. Aim for around 30 to 40 words.
 
 ## Updating contact details
 
 Open `src/components/sections/Contact.tsx`.
 
-- Email address: search for `mailto:rubenbaggen@gmail.com` and update both occurrences.
+- Email, LinkedIn and GitHub are the `CHANNELS` array at the top of the file.
 - LinkedIn URL: search for `linkedin.com/in/ruben-baggen`.
 - GitHub URL: search for `github.com/RubenBaggen` and update if your handle is different.
 
@@ -110,7 +119,7 @@ Open `src/components/sections/Contact.tsx`.
 If a new section is genuinely needed (not just a content tweak), create it under `src/components/sections/`, then import and render it in `src/pages/Homepage.tsx`. Follow the existing section patterns:
 
 1. Wrap everything in `<section id="anchor-id" className="...">`. The id enables anchor scrolling.
-2. Use `<ParallaxShape>` around any `<GradientBlob>` or `<GhostRing>` decorations.
-3. Wrap content blocks in `<FadeIn>` for scroll reveals.
+2. Use `font-display` for the big heading, and a 2px `border-stone-950` on cards to match the poster style.
+3. Wrap content blocks in `<FadeIn>` for scroll reveals. Add `data-cursor="Label"` to clickable images.
 4. Use `max-w-7xl mx-auto` on the inner content container.
 5. Add the section id to the `SECTIONS` array in `Header.tsx` if it should appear in the nav.

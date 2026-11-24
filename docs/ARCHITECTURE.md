@@ -19,7 +19,7 @@ The pre-existing OKLch neutral tokens (`--background`, `--foreground`, `--primar
 
 ### Typography
 
-The site uses Geist Variable, loaded via `@fontsource-variable/geist` and applied as the default `font-sans` family. All headings rely on `font-bold` (700) with tight tracking (`tracking-[-0.04em]` to `tracking-[-0.05em]`). Body copy is 17 to 22px with relaxed line-height (1.55 to 1.7).
+Body copy uses Geist Variable (`font-sans`). Headings use Bricolage Grotesque, loaded with its width axis (`@fontsource-variable/bricolage-grotesque/wdth.css`). The `font-display` utility in `index.css` sets it to 75% width, weight 800 and uppercase: the condensed poster voice used for every big heading, the tickers and the footer wordmark. All headings rely on `font-bold` (700) with tight tracking (`tracking-[-0.04em]` to `tracking-[-0.05em]`). Body copy is 17 to 22px with relaxed line-height (1.55 to 1.7).
 
 ### Spacing rhythm
 
@@ -37,40 +37,45 @@ The codebase splits components into four layers based on responsibility. Lower l
 ```
 pages/        Homepage
    ▲
-sections/     Hero, Ticker, WorkList, Experience, Contact,
+sections/     Hero, ScreenRail, Ticker, LogoWall, WorkList, Experience, Contact,
               CaseStudyDrawer, ImageCollage
    ▲
 ui/           Button, Badge        (interactive primitives)
-decorative/   GradientBlob, GhostRing, DotGrid    (pure visuals)
-motion/       FadeIn, ParallaxShape               (animation wrappers)
+motion/       FadeIn, Cursor                      (animation wrappers)
    ▲
 hooks/        useActiveSection, useReducedMotion
 lib/          utils (cn helper)
 ```
 
-**Why this split:** sections are large and content-heavy, so isolating reusable pieces (blobs, fade wrappers, buttons) keeps section files focused on layout and content. Decorative components are pure visual (no interactivity, no state, no children) so they can be re-used freely.
+**Why this split:** sections are large and content-heavy, so isolating reusable pieces (fade wrappers, cursor, buttons) keeps section files focused on layout and content.
 
 ## Motion strategy
 
 ### Why framer-motion
 
-Phase 1 explored CSS-only animations but the design calls for scroll-triggered parallax on decorative shapes and staggered hero reveals. CSS + IntersectionObserver works for fade-ins but parallax becomes janky. Framer-motion's `useScroll` + `useTransform` is the lightest solution that handles both.
+The design calls for staggered reveals, spring-based hover tilts, list re-ordering when filtering, and a spring-following cursor. Framer-motion handles all of these with one dependency.
 
 Bundle cost: about 30KB gzipped, included in the main JS chunk.
 
-### Two wrappers handle 90% of motion
+### Motion building blocks
 
 - **`<FadeIn>`** wraps any element. By default, it fades + slides up 12px when the element enters the viewport (`whileInView` with `viewport={{ once: true, margin: "-100px" }}`). Pass `immediate` on the hero for mount-time staggered reveals. Pass `delay` to stagger siblings.
 
-- **`<ParallaxShape>`** wraps any decorative element. It reads scroll progress against its parent and applies a Y-axis translate (default `-80px` over a full viewport scroll). Always wrap blobs and rings in this so they drift independently of section content.
+- **`<Cursor>`** is a cobalt follower dot that sits next to the native cursor. Any element with `data-cursor="Label"` makes it grow into a labelled bubble ("View", "Read", "Say hi"). It only renders on fine, hover-capable pointers.
+
+- **Hover tilts** (`whileHover={{ rotate, y }}`) on logo tiles, education cards and contact cards alternate direction per index, which gives the hand-placed, poster feel.
+
+- **CSS-only loops**: the tickers, the screenshot rail and the hero sticker are CSS keyframes, because they run continuously.
+
+- **Clip-path slants** (Vechtclub): the screenshot rail, the footer and the work-list image frames use `clip-path: polygon(...)`. Work-list frames straighten on row hover by transitioning `clip-path` through a CSS variable (`--slant`).
 
 ### Reduced motion is respected everywhere
 
 The `useReducedMotion()` hook is a thin wrapper around framer-motion's built-in detection. When the user has `prefers-reduced-motion: reduce` set:
 
 - `FadeIn` still fades but does not translate (no `y` offset).
-- `ParallaxShape` returns its child untouched (no transform applied).
-- The marquee animation is disabled via a `@media (prefers-reduced-motion: reduce)` query in `Ticker.tsx`.
+- `Cursor` does not render, and hover tilts are switched off.
+- Ticker, screenshot-rail and sticker animations are disabled via `@media (prefers-reduced-motion: reduce)` queries (the rail becomes horizontally scrollable).
 
 Always test new motion with the OS-level setting enabled (Windows: Settings → Accessibility → Visual effects → Animation effects off).
 
@@ -99,7 +104,13 @@ This gives the "lift off the hero, settle into a clear nav" effect without any c
 
 Adding a project means editing `content/projects.ts` only. See [CONTENT.md](./CONTENT.md).
 
-`Experience.tsx` follows the same pattern with `content/experience.ts` and the `ExperienceCard` internal component.
+Rows show the company logo, client logos (`clients`), and a slanted screenshot frame that straightens on hover and opens the gallery.
+
+`Experience.tsx` follows the same pattern with `content/experience.ts`: each card shows the institution logo, and the middle column is pushed down on desktop for a staggered grid.
+
+Logos live in `content/logos.ts`: one `LOGOS` map of imported SVG URLs, plus the `partners` array that drives `LogoWall.tsx`.
+
+`ScreenRail.tsx` collects every real screenshot from `projects.ts` (de-duplicated) into one endless strip; clicking a frame opens that project's gallery.
 
 ## Overlay pattern: CaseStudyDrawer and ImageCollage
 

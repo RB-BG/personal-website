@@ -1,3 +1,5 @@
+import { LOGOS } from "@/content/logos"
+
 export type Discipline = "Product" | "Design" | "Build" | "Research"
 
 export type CaseStudySection = {
@@ -22,6 +24,10 @@ export type Project = {
   /** Disciplines this work counts towards; drives the filter. */
   disciplines: ReadonlyArray<Discipline>
   company: string
+  /** Company logo URL (from `LOGOS`). Omit to show the company name only. */
+  logo?: string
+  /** Client logos shown in the work-list row (e.g. projects done via an agency). */
+  clients?: ReadonlyArray<{ name: string; logo: string }>
   period: string
   badge?: string
   title: string
@@ -49,6 +55,7 @@ export const projects: ReadonlyArray<Project> = [
     tagline: "A new generation ERP for bookkeepers",
     disciplines: ["Product", "Build"],
     company: "Brand Boekhouders",
+    logo: LOGOS.brandBoekhouders,
     period: "maart 2025 – heden",
     badge: "Current role",
     title: "IT Manager & product lead building a new generation ERP.",
@@ -93,6 +100,12 @@ export const projects: ReadonlyArray<Project> = [
     tagline: "Three government platforms, WCAG 2.0-compliant",
     disciplines: ["Design", "Build"],
     company: "Netcompany",
+    logo: LOGOS.netcompany,
+    clients: [
+      { name: "DuboCalc", logo: LOGOS.dubocalc },
+      { name: "VFPF", logo: LOGOS.vfpf },
+      { name: "Studielink", logo: LOGOS.studielink },
+    ],
     period: "okt 2024 – maart 2025",
     title: "Interface consultant on three public-sector platforms.",
     body: "UX specialist and interface designer in agile scrum teams &mdash; delivering WCAG 2.0-compliant prototypes for government clients. DuboCalc (Rijkswaterstaat), VFPF pension portal and Studielink for every Dutch university.",
@@ -139,6 +152,7 @@ export const projects: ReadonlyArray<Project> = [
     tagline: "Personalised learning inside games",
     disciplines: ["Research", "Design"],
     company: "&Ranj",
+    logo: LOGOS.ranj,
     period: "nov 2023 – aug 2024",
     badge: "AI · Game design",
     title: "AI-driven tutor for personalised learning in games.",

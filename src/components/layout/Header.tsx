@@ -59,7 +59,7 @@ function Header() {
 
         <a
           href="#contact"
-          className="inline-flex items-center gap-2 rounded-[7px] bg-brand-600 px-6 py-3 text-[15px] font-medium text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md"
+          className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-6 py-3 text-[15px] font-semibold text-white transition-all hover:-rotate-2 hover:bg-brand-600"
         >
           Get in touch
           <ArrowRight className="size-[15px]" strokeWidth={2.5} />

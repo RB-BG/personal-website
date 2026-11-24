@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/bricolage-grotesque/wdth.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -26,6 +26,15 @@
   section[id] {
     scroll-margin-top: 96px;
   }
+}
+
+/* Condensed display face — the NAR-style poster voice for big headings */
+@utility font-display {
+  font-family: var(--font-heading);
+  font-stretch: 75%;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
 
 /* Hero emphasis underline draws itself in */
