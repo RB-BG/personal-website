@@ -4,32 +4,31 @@ Most content updates do not require touching JSX. Use this guide.
 
 ## Adding or editing a project
 
-Open `src/content/projects.ts`. Each project is an object in the `projects` array. To add a fifth project, append a new object. To edit, change the fields in place.
+Open `src/content/projects.ts`. Each project is an object in the `projects` array and renders one row in the "Selected work" list (`WorkList.tsx`), plus its case study drawer and gallery. To add a project, append a new object. To edit, change the fields in place.
 
 ```ts
 {
   slug: "my-new-project",                            // url-safe id, used as the React key
-  company: "Company Name",                           // shown in the eyebrow + page
-  period: "jan 2025 – heden",                        // shown in the eyebrow
-  badge: "Optional badge",                           // pill on the image card, omit for none
-  title: "Headline that describes the work.",        // h3 in the section
+  shortTitle: "Short name",                          // lead of the row title, shown before "/ Company"
+  role: "Your role",                                 // shown after the tagline
+  tagline: "One line about the work.",               // row subtitle
+  disciplines: ["Product", "Build"],                 // filter chips: Product | Design | Build | Research
+  company: "Company Name",                           // shown in the row title + drawer
+  period: "jan 2025 – heden",                        // shown top-left in the row + drawer
+  badge: "Optional badge",                           // optional label, omit for none
+  title: "Headline that describes the work.",        // drawer heading
   body: "One paragraph of context. HTML entities like &mdash; and <strong>...</strong> work here.",
-  tags: ["Tag 1", "Tag 2", "Tag 3"],                 // first tag gets the brand gradient, rest are neutral
-  gradient: { from: "#hex", via: "#hex", to: "#hex" },  // image placeholder + drawer header gradient
-  accentClass: "text-brand-600",                     // eyebrow + link text colour (Tailwind class)
-  blobColor: "#7c3aed",                              // hex used for the decorative parallax blob behind the section
-  bgClass: "bg-stone-50",                            // section background colour (Tailwind class)
-  imgLeft: true,                                     // true = image left, false = image right (also controls drawer slide direction)
-  href: "#",                                         // will become "/work/my-new-project" in Phase 3
+  tags: ["Tag 1", "Tag 2", "Tag 3"],                 // first four are shown as chips in the row
+  gradient: { from: "#hex", via: "#hex", to: "#hex" },  // drawer header + gallery placeholder gradient
+  blobColor: "#2650ff",                              // hex used for the drawer accent dot
+  imgLeft: true,                                     // controls the drawer slide direction (left or right)
   caseStudy: {
     intro: "One paragraph that opens the drawer.",
     sections: [
       { heading: "Section heading", body: "One or two paragraphs." },
-      // add more sections as needed
     ],
     outcomes: [
-      "One concrete result per bullet",
-      // aim for 3 to 5 outcomes
+      "One concrete result per bullet",                // aim for 3 to 5 outcomes
     ],
   },
 }
@@ -37,10 +36,10 @@ Open `src/content/projects.ts`. Each project is an object in the `projects` arra
 
 **Rules of thumb:**
 
-- Alternate `imgLeft` and `bgClass` between projects so the page reads as zebra-striped (`stone-50` and `white` alternate).
-- Pick `accentClass` and `blobColor` from the same colour family (e.g. `text-sky-500` with `#0284c7`).
-- Keep `body` to two or three sentences. Long copy breaks the rhythm.
-- The first tag should be the project's defining role or domain. It gets visual emphasis through the brand-gradient background.
+- Keep `tagline` to one short line. The row stays scannable that way.
+- Pick `disciplines` carefully: a project appears under every filter chip you list.
+- The first four `tags` are shown in the row, so put the most important ones first.
+- `role` should say what you actually did, in the words of the case study.
 
 ## Editing the image gallery (ImageCollage)
 
@@ -74,41 +73,44 @@ Open `src/content/experience.ts`. Each entry renders a card in the Experience gr
   institution: "Universiteit Utrecht",               // bold institution name
   role: "MSc Human-Computer Interaction",            // role line
   description: "One or two sentence summary.",       // body text
-  accentClass: "text-brand-600",                     // eyebrow colour (Tailwind class)
-  bar: ["#5b21b6", "#a78bfa"],                       // gradient hex pair for the top bar
-  ringColor: "#7c3aed",                              // hex for the corner ghost-ring
+  logo: LOGOS.utrecht,                               // institution logo, see content/logos.ts
 },
 ```
 
-The grid renders three cards per row on desktop, two on tablet, one on mobile, in the order the array defines.
+The grid renders three cards per row on desktop (middle column dropped down), two on tablet, one on mobile, in the order the array defines.
 
-## Editing the company marquee
+## Editing logos and the logo wall
 
-Open `src/components/sections/LogoMarquee.tsx`. The `COMPANIES` array near the top of the file is the source of truth.
+All logos are SVGs in `src/assets/logos/`. Register a new one in the `LOGOS` map in `src/content/logos.ts`, then use it anywhere: a project's `logo` or `clients`, an education card's `logo`, or the logo wall.
+
+The logo wall is the `partners` array in the same file:
 
 ```ts
-const COMPANIES = [
-  "Brand Boekhouders",
-  "Netcompany",
-  // add or reorder here
-] as const
+{ name: "Netcompany", logo: LOGOS.netcompany, note: "Interface consultant · 2024 – 2025" },
+{ name: "Long Covid Toolkit", note: "Volunteer · 2023" },   // no logo → name is shown as a wordmark
 ```
 
-Currently the marquee renders text labels in light grey. When real logo SVGs are ready, replace the `<span>` inside the map with `<img src={...} />` and update the array to point at logo modules.
+`note` slides up on hover. Only write facts that are also in your project content.
+
+`long-covid-toolkit.svg` is a broken auto-trace (it renders as a dark square), so it is not used. Replace it with a clean SVG to show that logo.
+
+## Editing the tickers
+
+The text bands are `<Ticker items={[...]} />`. The cobalt band is in `src/pages/Homepage.tsx`, the white "Education • Boards" band is at the top of `Experience.tsx`. Props: `tone` (`"brand"` or `"light"`), `size` (`"lg"` or `"md"`), `reverse`, and `tilt` (degrees).
 
 ## Updating the hero copy
 
 Open `src/components/sections/Hero.tsx`. The headline, gradient span, subtitle, badge text and CTA labels are inline in the JSX. Keep the existing structure:
 
 - The badge stays under 30 characters or it wraps.
-- The headline is set to scale fluidly via `clamp(56px, 9.5vw, 148px)`. Headlines longer than two lines break the visual balance.
+- The headline uses `font-display` and scales via `clamp(60px, 11.5vw, 180px)`. Keep it to four short lines.
 - The subtitle has `max-w-[620px]`. Aim for around 30 to 40 words.
 
 ## Updating contact details
 
 Open `src/components/sections/Contact.tsx`.
 
-- Email address: search for `mailto:rubenbaggen@gmail.com` and update both occurrences.
+- Email, LinkedIn and GitHub are the `CHANNELS` array at the top of the file.
 - LinkedIn URL: search for `linkedin.com/in/ruben-baggen`.
 - GitHub URL: search for `github.com/RubenBaggen` and update if your handle is different.
 
@@ -117,7 +119,7 @@ Open `src/components/sections/Contact.tsx`.
 If a new section is genuinely needed (not just a content tweak), create it under `src/components/sections/`, then import and render it in `src/pages/Homepage.tsx`. Follow the existing section patterns:
 
 1. Wrap everything in `<section id="anchor-id" className="...">`. The id enables anchor scrolling.
-2. Use `<ParallaxShape>` around any `<GradientBlob>` or `<GhostRing>` decorations.
-3. Wrap content blocks in `<FadeIn>` for scroll reveals.
+2. Use `font-display` for the big heading, and a 2px `border-stone-950` on cards to match the poster style.
+3. Wrap content blocks in `<FadeIn>` for scroll reveals. Add `data-cursor="Label"` to clickable images.
 4. Use `max-w-7xl mx-auto` on the inner content container.
 5. Add the section id to the `SECTIONS` array in `Header.tsx` if it should appear in the nav.

@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/bricolage-grotesque/wdth.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -28,20 +28,18 @@
   }
 }
 
+/* Condensed display face — the NAR-style poster voice for big headings */
+@utility font-display {
+  font-family: var(--font-heading);
+  font-stretch: 75%;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
 /* Hero emphasis underline draws itself in */
 @keyframes hero-underline {
   to { stroke-dashoffset: 0; }
-}
-
-/* Film-grain signature — a subtle warm texture over the whole page */
-.grain-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 45;
-  pointer-events: none;
-  opacity: 0.04;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -86,18 +84,18 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Brand orange — primary CTAs, headings accent, warm signal */
-  --color-brand-50: #fdf1ea;
-  --color-brand-100: #fbdccb;
-  --color-brand-200: #f6c3a4;
-  --color-brand-300: #efa376;
-  --color-brand-400: #e77f47;
-  --color-brand-500: #db5a24;
-  --color-brand-600: #c44e1c;
-  --color-brand-700: #a84019;
-  --color-brand-800: #8a3416;
-  --color-brand-900: #6d2b15;
-  --color-brand-950: #3f1a0e;
+  /* Cobalt — primary CTAs, headings accent, links */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #dde5ff;
+  --color-brand-200: #bccbff;
+  --color-brand-300: #8fa6ff;
+  --color-brand-400: #5f7fff;
+  --color-brand-500: #4a6dff;
+  --color-brand-600: #2650ff;
+  --color-brand-700: #1d3fd6;
+  --color-brand-800: #1a33a8;
+  --color-brand-900: #152a82;
+  --color-brand-950: #0a1124;
 
   /* Ice blue — the cool counter-accent to brand orange */
   --color-ice-50: #ecf7fb;
@@ -135,15 +133,19 @@
   --color-pink-700: #be185d;
   --color-pink-900: #831843;
 
-  /* Warm ivory neutrals — the ground the whole site sits on */
-  --color-stone-50: #f7f3ea;
-  --color-stone-100: #f2ecdf;
-  --color-stone-150: #ece4d3;
-  --color-stone-200: #e6ddcb;
-  --color-stone-400: #a89e8c;
-  --color-stone-500: #6d6355;
-  --color-stone-600: #5c5346;
-  --color-stone-950: #241d15;
+  /* Cool ink neutrals — the ground the whole site sits on */
+  --color-stone-50: #f2f5fb;
+  --color-stone-100: #e8edf7;
+  --color-stone-150: #dfe6f3;
+  --color-stone-200: #c9d3ea;
+  --color-stone-300: #aab6d0;
+  --color-stone-400: #8794b3;
+  --color-stone-500: #66728f;
+  --color-stone-600: #4b5671;
+  --color-stone-700: #353f58;
+  --color-stone-800: #1d2640;
+  --color-stone-900: #111933;
+  --color-stone-950: #0a1124;
 }
 
 :root {

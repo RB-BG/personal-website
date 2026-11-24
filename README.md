@@ -1,6 +1,6 @@
 # Ruben Baggen — Personal Website
 
-Personal portfolio for Ruben Baggen (Product Manager & Designer, Brand Boekhouders). Built as a single long-scroll homepage with anchor navigation, scroll-triggered animations, and a clean, playful violet + amber design.
+Personal portfolio for Ruben Baggen (Product Manager & Designer, Brand Boekhouders). Built as a single long-scroll homepage with anchor navigation, scroll-triggered animations, and a cobalt-and-ink design with an agenda-style work list.
 
 ## Stack
 
@@ -12,7 +12,7 @@ Personal portfolio for Ruben Baggen (Product Manager & Designer, Brand Boekhoude
 | Component primitives | `@base-ui/react` (headless) + shadcn-style wrappers in `src/components/ui` |
 | Variant system | `class-variance-authority` (CVA) |
 | Icons | `lucide-react` (brand icons inlined as SVG because Lucide 1.x dropped trademarked icons) |
-| Animation | `framer-motion` for scroll-reveals, parallax shapes, overlays and masonry FLIP, CSS keyframes for the logo marquee |
+| Animation | `framer-motion` for scroll-reveals, parallax shapes, overlays and masonry FLIP, CSS keyframes for the skills ticker |
 | Font | `@fontsource-variable/geist` (loaded in `src/index.css`) |
 | Path alias | `@/*` resolves to `./src/*` |
 
@@ -47,13 +47,13 @@ src/
 ├── components/
 │   ├── ui/                      # shadcn-style primitives (Button, Badge)
 │   ├── layout/                  # Header, Footer
-│   ├── sections/                # Hero, LogoMarquee, WorkIntro, ProjectSection, Experience, Contact,
+│   ├── sections/                # Hero, ScreenRail, Ticker, LogoWall, WorkList, Experience, Contact,
 │   │                            # CaseStudyDrawer, ImageCollage
-│   ├── decorative/              # GradientBlob, GhostRing, DotGrid (pure visual)
-│   └── motion/                  # FadeIn, ParallaxShape (framer-motion wrappers)
+│   └── motion/                  # FadeIn, Cursor (framer-motion wrappers)
 ├── content/
 │   ├── projects.ts              # data array driving the 4 project sections + case study drawers + galleries
-│   └── experience.ts            # data array driving the experience grid cards
+│   ├── experience.ts            # data array driving the experience grid cards
+│   └── logos.ts                 # every logo URL + the logo-wall entries
 ├── hooks/
 │   ├── useActiveSection.ts      # IntersectionObserver hook for header active state
 │   └── useReducedMotion.ts      # respects prefers-reduced-motion
@@ -66,13 +66,15 @@ src/
 ## Documentation
 
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md): why the codebase is shaped this way (design system, motion strategy, anchor scrolling, overlay patterns, masonry layout algorithm).
-- [docs/CONTENT.md](./docs/CONTENT.md): how to add or edit a project, case study, gallery images, education entry, or company name in the marquee without touching JSX.
+- [docs/CONTENT.md](./docs/CONTENT.md): how to add or edit a project, case study, gallery images, education entry, logo, or ticker word in the marquee without touching JSX.
 
 ## Roadmap
 
 **Phase 1 (done):** static HTML preview in `preview/homepage.html`, pushed to Figma as "Homepage v2" for design review.
 
-**Phase 2 (done, current state):** homepage as production React. Smooth anchor scroll, scroll-reveal fade-ins, parallax decorative shapes, hover micro-interactions, reduced-motion fallbacks, full responsive layout. Slide-in case study drawer per project (alternating left/right). Image gallery with masonry layout, wave-hover effect and FLIP click expansion, hover captions. Deployed to Vercel.
+**Phase 2 (done):** homepage as production React. Smooth anchor scroll, scroll-reveal fade-ins, parallax decorative shapes, hover micro-interactions, reduced-motion fallbacks, full responsive layout. Slide-in case study drawer per project (alternating left/right). Image gallery with masonry layout, wave-hover effect and FLIP click expansion, hover captions. Deployed to Vercel.
+
+**Phase 2.5 (done, current state):** cobalt identity and a more playful, image-led layout inspired by nar.nl and vechtclub.nl: condensed poster headings, slanted screenshot rail, text tickers, logo wall, filterable work list with slanted screenshot frames, staggered education cards with logos, follower cursor and rotating sticker.
 
 **Phase 3 (planned):**
 - Case-study subpages at `/work/[slug]` (requires `react-router-dom`). Drawer content migrates to full pages.

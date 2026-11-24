@@ -77,7 +77,7 @@ function Hero() {
       className="relative flex min-h-[92vh] items-center overflow-hidden px-6 pt-48 pb-36 lg:px-18"
       style={{
         background:
-          "linear-gradient(150deg, #f7e2d2 0%, #f7f3ea 50%, #dcecf1 100%)",
+          "linear-gradient(150deg, #dfe6ff 0%, #f2f5fb 50%, #dff0f7 100%)",
       }}
     >
       {/* Spotlight dot-grid — masked to a soft circle under the cursor */}
@@ -141,8 +141,9 @@ function Hero() {
       />
 
       <div className="relative z-10 mx-auto w-full max-w-7xl">
+        <Sticker reduced={reduced} />
         <FadeIn immediate delay={0.1} duration={0.9}>
-          <span className="mb-14 inline-flex items-center gap-2.5 rounded-md border border-stone-200 bg-white/70 px-4 py-2 text-[13px] font-semibold text-stone-950 backdrop-blur-sm">
+          <span className="mb-14 inline-flex items-center gap-2.5 rounded-full border-2 border-stone-950 bg-white/70 px-4 py-2 text-[13px] font-semibold text-stone-950 backdrop-blur-sm">
             <span className="relative inline-flex size-[7px]">
               <span className="absolute inset-0 rounded-full bg-ice-500" />
               <span className="absolute inset-0 animate-ping rounded-full bg-ice-500 opacity-60" />
@@ -152,7 +153,7 @@ function Hero() {
         </FadeIn>
 
         <FadeIn immediate delay={0.25} duration={0.9}>
-          <h1 className="mb-10 max-w-[1200px] text-[clamp(54px,9.4vw,146px)] leading-[0.92] font-semibold tracking-[-0.035em] text-stone-950">
+          <h1 className="mb-10 max-w-[1100px] font-display text-[clamp(60px,11.5vw,180px)] leading-[0.84] text-stone-950">
             Product manager,
             <br />
             <span className="relative whitespace-nowrap text-brand-600">
@@ -199,14 +200,14 @@ function Hero() {
               href="#work"
               onPointerMove={onMagnet}
               onPointerLeave={resetMagnet}
-              className="inline-flex items-center gap-2.5 rounded-[7px] bg-brand-600 px-9 py-5 text-base font-semibold text-white shadow-[0_12px_30px_-8px_rgba(219,90,36,0.55)] transition-[background,box-shadow,transform] duration-200 hover:bg-brand-700 hover:shadow-[0_16px_36px_-8px_rgba(219,90,36,0.6)]"
+              className="inline-flex items-center gap-2.5 rounded-full bg-brand-600 px-9 py-5 text-base font-semibold text-white shadow-[0_12px_30px_-8px_rgba(38,80,255,0.5)] transition-[background,box-shadow,transform] duration-200 hover:bg-brand-700 hover:shadow-[0_16px_36px_-8px_rgba(38,80,255,0.55)]"
             >
               View selected work
               <ArrowRight className="size-[17px]" strokeWidth={2.5} />
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2.5 rounded-[7px] border border-ice-500/60 bg-white/60 px-9 py-5 text-base font-medium text-ice-700 backdrop-blur-md transition-colors hover:bg-ice-50/80"
+              className="inline-flex items-center gap-2.5 rounded-full border-2 border-stone-950 bg-white/70 px-9 py-5 text-base font-semibold text-stone-950 backdrop-blur-md transition-all hover:rotate-2 hover:bg-white"
             >
               Get in touch
             </a>
@@ -214,6 +215,42 @@ function Hero() {
         </FadeIn>
       </div>
     </section>
+  )
+}
+
+/**
+ * Rotating round sticker (NAR-style playful mark). Text runs on a circular
+ * path and spins slowly; the centre arrow jumps to the work list.
+ */
+function Sticker({ reduced }: { reduced: boolean }) {
+  return (
+    <a
+      href="#work"
+      data-cursor="Work"
+      aria-label="Jump to selected work"
+      className="group absolute top-0 right-0 hidden size-44 -rotate-12 transition-transform duration-500 hover:rotate-0 lg:block xl:size-52"
+    >
+      <svg
+        viewBox="0 0 200 200"
+        className="size-full"
+        style={reduced ? undefined : { animation: "sticker-spin 18s linear infinite" }}
+        aria-hidden
+      >
+        <circle cx="100" cy="100" r="98" className="fill-brand-600" />
+        <defs>
+          <path id="sticker-path" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0" />
+        </defs>
+        <text className="fill-white font-display text-[21px] tracking-[0.12em]">
+          <textPath href="#sticker-path">Product • Design • Build • Product • Design • Build •</textPath>
+        </text>
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center">
+        <span className="flex size-16 items-center justify-center rounded-full bg-white text-stone-950 transition-transform duration-300 group-hover:rotate-45">
+          <ArrowRight className="size-7 rotate-90" strokeWidth={2.5} />
+        </span>
+      </span>
+      <style>{`@keyframes sticker-spin { to { transform: rotate(360deg); } }`}</style>
+    </a>
   )
 }
 

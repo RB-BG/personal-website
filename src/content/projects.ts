@@ -1,3 +1,7 @@
+import { LOGOS } from "@/content/logos"
+
+export type Discipline = "Product" | "Design" | "Build" | "Research"
+
 export type CaseStudySection = {
   heading: string
   body: string
@@ -11,7 +15,19 @@ export type CaseStudy = {
 
 export type Project = {
   slug: string
+  /** Short name used as the lead of the work-list row (e.g. "BERP"). */
+  shortTitle: string
+  /** Role held, shown after the tagline. */
+  role: string
+  /** One-line summary shown in the work-list row. */
+  tagline: string
+  /** Disciplines this work counts towards; drives the filter. */
+  disciplines: ReadonlyArray<Discipline>
   company: string
+  /** Company logo URL (from `LOGOS`). Omit to show the company name only. */
+  logo?: string
+  /** Client logos shown in the work-list row (e.g. projects done via an agency). */
+  clients?: ReadonlyArray<{ name: string; logo: string }>
   period: string
   badge?: string
   title: string
@@ -19,16 +35,10 @@ export type Project = {
   tags: ReadonlyArray<string>
   /** Gradient stops for the image placeholder card. */
   gradient: { from: string; via: string; to: string }
-  /** Accent text colour for eyebrow + link (Tailwind class). */
-  accentClass: string
   /** Hex used for the parallax blob behind the section. */
   blobColor: string
-  /** Section background colour (Tailwind class). */
-  bgClass: string
   /** If true, image is rendered on the left, content on the right. */
   imgLeft: boolean
-  /** Placeholder href — will become a route in Phase 3. */
-  href: string
   /** Optional real screenshot. Path relative to /public (e.g. "/images/berp-dashboard.png"). */
   screenshot?: string
   /** Optional real images for the gallery. Fills slots from index 0 upward; remaining slots use gradient placeholders. */
@@ -40,18 +50,20 @@ export type Project = {
 export const projects: ReadonlyArray<Project> = [
   {
     slug: "brand-boekhouders",
+    shortTitle: "BERP",
+    role: "IT Manager & product lead",
+    tagline: "A new generation ERP for bookkeepers",
+    disciplines: ["Product", "Build"],
     company: "Brand Boekhouders",
+    logo: LOGOS.brandBoekhouders,
     period: "maart 2025 – heden",
     badge: "Current role",
     title: "IT Manager & product lead building a new generation ERP.",
     body: "Responsible for establishing and professionalizing Brand Boekhouders' entire IT infrastructure. Defining strategic vision, shaping product development and ensuring our software is scalable, customer-centric and efficient for bookkeepers across the Netherlands.",
     tags: ["Product Strategy", "React 19", "TypeScript", "Django 5", "IT Management"],
     gradient: { from: "#3730a3", via: "#6366f1", to: "#a78bfa" },
-    accentClass: "text-brand-600",
     blobColor: "#7c3aed",
-    bgClass: "bg-stone-50",
     imgLeft: true,
-    href: "#",
     screenshot: "/images/BrandLogin.png",
     galleryImages: [
       { src: "/images/BrandDashboard.png", ratio: 16 / 9, caption: "BERP Dashboard" },
@@ -83,17 +95,24 @@ export const projects: ReadonlyArray<Project> = [
   },
   {
     slug: "netcompany",
+    shortTitle: "Public platforms",
+    role: "Interface consultant",
+    tagline: "Three government platforms, WCAG 2.0-compliant",
+    disciplines: ["Design", "Build"],
     company: "Netcompany",
+    logo: LOGOS.netcompany,
+    clients: [
+      { name: "DuboCalc", logo: LOGOS.dubocalc },
+      { name: "VFPF", logo: LOGOS.vfpf },
+      { name: "Studielink", logo: LOGOS.studielink },
+    ],
     period: "okt 2024 – maart 2025",
     title: "Interface consultant on three public-sector platforms.",
     body: "UX specialist and interface designer in agile scrum teams &mdash; delivering WCAG 2.0-compliant prototypes for government clients. DuboCalc (Rijkswaterstaat), VFPF pension portal and Studielink for every Dutch university.",
     tags: ["UX Design", "React", "WCAG 2.0", "Government", "Prototyping"],
     gradient: { from: "#0c4a6e", via: "#0284c7", to: "#38bdf8" },
-    accentClass: "text-sky-500",
     blobColor: "#0284c7",
-    bgClass: "bg-white",
     imgLeft: false,
-    href: "#",
     screenshot: "/images/DubocalcMaterials.png",
     galleryImages: [
       { src: "/images/DubocalcMaterials.png", ratio: 1946 / 1206, caption: "DuboCalc — Nationale Milieudatabase" },
@@ -128,18 +147,20 @@ export const projects: ReadonlyArray<Project> = [
   },
   {
     slug: "ranj",
+    shortTitle: "AI tutor",
+    role: "AI Game Research Intern",
+    tagline: "Personalised learning inside games",
+    disciplines: ["Research", "Design"],
     company: "&Ranj",
+    logo: LOGOS.ranj,
     period: "nov 2023 – aug 2024",
     badge: "AI · Game design",
     title: "AI-driven tutor for personalised learning in games.",
     body: "As AI Game Research Intern I designed a personalised AI tutor operating independently of specific game mechanics &mdash; engaging players through tailored feedback and knowledge transfer grounded in didactic principles.",
     tags: ["AI Research", "Game design", "Learning science", "UX Research"],
     gradient: { from: "#78350f", via: "#d97706", to: "#fde68a" },
-    accentClass: "text-amber-600",
     blobColor: "#d97706",
-    bgClass: "bg-stone-50",
     imgLeft: true,
-    href: "#",
     caseStudy: {
       intro:
         "&Ranj is one of Europe's most respected serious game studios. During my internship I worked on a research question at the intersection of AI, game design, and learning science: can a conversational AI tutor improve learning outcomes in games without being tightly coupled to a specific game's mechanics?",
@@ -167,17 +188,18 @@ export const projects: ReadonlyArray<Project> = [
   },
   {
     slug: "long-covid-toolkit",
+    shortTitle: "Long Covid Toolkit",
+    role: "Design & project specialist (volunteer)",
+    tagline: "Helping people live well with Long Covid",
+    disciplines: ["Design", "Product"],
     company: "Long Covid Toolkit",
     period: "Volunteer · mei – sep 2023",
     title: "A toolkit empowering people to live well with Long Covid.",
     body: "Pro-bono design and project specialist on a public health platform combining scientific evidence with patient and clinician experience. I led website design, defined project requirements and supported community management.",
     tags: ["Volunteer", "UX Design", "Healthcare", "Project management"],
     gradient: { from: "#831843", via: "#ec4899", to: "#f0abfc" },
-    accentClass: "text-pink-700",
     blobColor: "#ec4899",
-    bgClass: "bg-white",
     imgLeft: false,
-    href: "#",
     screenshot: "/images/LongCovidMedicine.png",
     galleryImages: [
       { src: "/images/LongCovidMedicine.png", ratio: 1438 / 1234, caption: "Long Covid Toolkit — medicijn-effectiviteit & bewijs" },
