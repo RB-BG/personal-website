@@ -92,7 +92,9 @@ The logo wall is the `partners` array in the same file:
 
 `note` slides up on hover. Only write facts that are also in your project content.
 
-`long-covid-toolkit.svg` currently holds only the wordmark (the icon was an embedded PNG). Drop in the full SVG to show the icon as well.
+`long-covid-toolkit.svg` is the official logo from longcovidtoolkit.nl. `studielink.svg` combines the official Studielink mark (from studielink.nl) with the wordmark set in Montserrat Bold, converted to paths.
+
+Copy style: no em dashes in visible text; use a colon, comma or middle dot (·) instead.
 
 ## Editing the tickers
 

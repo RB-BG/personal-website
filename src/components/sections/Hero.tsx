@@ -156,26 +156,29 @@ function Hero() {
           <h1 className="mb-10 max-w-[1100px] font-display text-[clamp(60px,11.5vw,180px)] leading-[0.84] text-stone-950">
             Product manager,
             <br />
-            <span className="relative whitespace-nowrap text-brand-600">
+            {/* Marker highlight drawn behind the lower half of the word.
+                It stays inside the word's own line box, so it never runs
+                into the next line at this tight leading. */}
+            <span className="relative isolate whitespace-nowrap text-brand-600">
               designer
               <svg
                 aria-hidden
-                viewBox="0 0 300 12"
+                viewBox="0 0 300 40"
                 preserveAspectRatio="none"
-                className="absolute inset-x-0 -bottom-[0.14em] h-[0.16em] w-full overflow-visible"
+                className="absolute -left-[0.06em] bottom-[0.13em] -z-10 h-[0.36em] w-[calc(100%+0.12em)] overflow-visible"
               >
                 <path
-                  d="M4 8 C 70 2, 150 2, 220 6 S 292 9, 296 5"
-                  className="fill-none stroke-ice-500"
-                  strokeWidth={7}
+                  d="M8 24 C 70 14, 150 30, 220 20 S 280 16, 292 18"
+                  className="fill-none stroke-ice-200"
+                  strokeWidth={30}
                   strokeLinecap="round"
                   style={
                     reduced
                       ? undefined
                       : {
-                          strokeDasharray: 520,
-                          strokeDashoffset: 520,
-                          animation: "hero-underline .9s ease .9s forwards",
+                          strokeDasharray: 340,
+                          strokeDashoffset: 340,
+                          animation: "hero-underline .8s cubic-bezier(.65,0,.35,1) .9s forwards",
                         }
                   }
                 />
@@ -188,7 +191,7 @@ function Hero() {
         <FadeIn immediate delay={0.4} duration={0.9}>
           <p className="mb-16 max-w-[620px] text-[22px] leading-[1.55] text-stone-600">
             I work at the intersection of technology, product strategy and user
-            experience &mdash; shaping products from vision to launch. Currently
+            experience, shaping products from vision to launch. Currently
             leading IT at Brand Boekhouders.
           </p>
         </FadeIn>

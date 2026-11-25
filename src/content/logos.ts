@@ -44,7 +44,7 @@ export const partners: ReadonlyArray<Partner> = [
   { name: "Brand Boekhouders", logo: LOGOS.brandBoekhouders, note: "IT Manager · 2025 – now" },
   { name: "Netcompany", logo: LOGOS.netcompany, note: "Interface consultant · 2024 – 2025" },
   { name: "DuboCalc", logo: LOGOS.dubocalc, note: "Rijkswaterstaat · via Netcompany" },
-  { name: "Vervangingsfonds Participatiefonds", logo: LOGOS.vfpf, note: "Pension portal · via Netcompany" },
+  { name: "Vervangingsfonds Participatiefonds", logo: LOGOS.vfpf, note: "Primary-education benefits portal · via Netcompany" },
   { name: "Studielink", logo: LOGOS.studielink, note: "Every Dutch university · via Netcompany" },
   { name: "&Ranj", logo: LOGOS.ranj, note: "MSc thesis research · 2023 – 2024" },
   { name: "Sniptech", logo: LOGOS.sniptech, note: "Relationship Support Manager · 2021 – 2023" },
