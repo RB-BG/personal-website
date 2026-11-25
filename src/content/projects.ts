@@ -102,42 +102,42 @@ export const projects: ReadonlyArray<Project> = [
     logo: LOGOS.netcompany,
     clients: [
       { name: "DuboCalc", logo: LOGOS.dubocalc },
-      { name: "VFPF", logo: LOGOS.vfpf },
+      { name: "VfPf", logo: LOGOS.vfpf },
       { name: "Studielink", logo: LOGOS.studielink },
     ],
     period: "Oct 2024 – Mar 2025",
     title: "Interface consultant on three public-sector platforms.",
-    body: "Interface designer and UX specialist in scrum teams for public-sector clients: usability, accessibility and customer journeys in the analysis, low- and high-fidelity prototypes, help with the React front-end, and visual QA in testing. Clients: DuboCalc (Rijkswaterstaat), the VFPF pension portal and Studielink.",
+    body: "Interface designer and UX specialist in scrum teams for public-sector clients: usability, accessibility and customer journeys in the analysis, low- and high-fidelity prototypes, help with the React front-end, and visual QA in testing. Clients: DuboCalc (Rijkswaterstaat), the VfPf portal for primary education and Studielink.",
     tags: ["UX Design", "Prototyping", "React", "WCAG 2.0", "Customer journeys"],
     gradient: { from: "#0c4a6e", via: "#0284c7", to: "#38bdf8" },
     blobColor: "#0284c7",
     imgLeft: false,
     screenshot: "/images/DubocalcMaterials.png",
     galleryImages: [
-      { src: "/images/DubocalcMaterials.png", ratio: 1946 / 1206, caption: "DuboCalc — National Environmental Database" },
-      { src: "/images/VfpfDashboard.png", ratio: 1680 / 1057, caption: "VFPF — Benefits dashboard" },
-      { src: "/images/DubocalcMki.png", ratio: 1946 / 1580, caption: "DuboCalc — environmental cost indicators & life-cycle analysis" },
-      { src: "/images/VfpfDetail.png", ratio: 1680 / 1370, caption: "VFPF — Benefit details & decision" },
+      { src: "/images/DubocalcMaterials.png", ratio: 1946 / 1206, caption: "DuboCalc: National Environmental Database" },
+      { src: "/images/VfpfDashboard.png", ratio: 1680 / 1057, caption: "VfPf: benefits dashboard" },
+      { src: "/images/DubocalcMki.png", ratio: 1946 / 1580, caption: "DuboCalc: environmental cost indicators & life-cycle analysis" },
+      { src: "/images/VfpfDetail.png", ratio: 1680 / 1370, caption: "VfPf: benefit details & decision" },
     ],
     caseStudy: {
       intro:
         "At Netcompany I worked as an interface consultant across three scrum teams, each building a digital platform for a Dutch public-sector client. Every project came with its own stakeholders and constraints, and with WCAG 2.0 AA as the accessibility target. Besides design, I helped implement the front-end in React and checked builds for visual front-end bugs during testing.",
       sections: [
         {
-          heading: "DuboCalc — Rijkswaterstaat",
+          heading: "DuboCalc (Rijkswaterstaat)",
           body: "DuboCalc is the sustainability calculation tool used by engineers on Dutch infrastructure projects. I worked on the interface for its complex multi-step forms, designed components with WCAG 2.0 AA in mind, and delivered Figma prototypes that the development team built from.",
         },
         {
-          heading: "VFPF pension portal",
-          body: "The VFPF portal serves pension fund members across a wide age range. I designed member-facing dashboards and detail screens that had to be both data-rich and easy to read, with attention to contrast, typographic hierarchy and plain-language copy.",
+          heading: "VfPf portal",
+          body: "VfPf (Vervangingsfonds and Participatiefonds) supports school boards in Dutch primary education with the costs of replacing absent staff, and with unemployment benefits and reintegration. I designed dashboards and detail screens for its portal that had to be both data-rich and easy to read, with attention to contrast, typographic hierarchy and plain-language copy.",
         },
         {
           heading: "Studielink",
-          body: "Studielink is the enrolment portal used by every prospective student in the Netherlands. Here I worked as a business analyst rather than a designer, focused on the international student login flow. I reworked the phone-number verification step &mdash; mapping the existing journey, specifying the requirements and edge cases, and aligning the flow with the development team.",
+          body: "Studielink is the enrolment portal used by every prospective student in the Netherlands. Here I worked as a business analyst rather than a designer, focused on the international student login flow. I reworked the phone-number verification step: mapping the existing journey, specifying the requirements and edge cases, and aligning the flow with the development team.",
         },
       ],
       outcomes: [
-        "Interface designs for DuboCalc and VFPF, with WCAG 2.0 AA as the target",
+        "Interface designs for DuboCalc and VfPf, with WCAG 2.0 AA as the target",
         "Low- and high-fidelity prototypes that guided refinement and development",
         "Helped build the React front-end and caught visual bugs during testing",
         "Specified the reworked phone-number verification flow for international students on Studielink",
@@ -166,7 +166,7 @@ export const projects: ReadonlyArray<Project> = [
       sections: [
         {
           heading: "The research question",
-          body: "Existing AI tutors in games are typically hard-wired to a single title — they know the game world, its characters, its progression. That makes them expensive to build and impossible to reuse. The question was whether a game-agnostic tutor could be just as effective, by focusing on the learner rather than the game.",
+          body: "Existing AI tutors in games are typically hard-wired to a single title: they know the game world, its characters, its progression. That makes them expensive to build and impossible to reuse. The question was whether a game-agnostic tutor could be just as effective, by focusing on the learner rather than the game.",
         },
         {
           heading: "Framework design",
@@ -201,8 +201,8 @@ export const projects: ReadonlyArray<Project> = [
     imgLeft: false,
     screenshot: "/images/LongCovidMedicine.png",
     galleryImages: [
-      { src: "/images/LongCovidMedicine.png", ratio: 1438 / 1234, caption: "Long Covid Toolkit — medicine effectiveness & evidence" },
-      { src: "/images/LongCovidTreatments.png", ratio: 1440 / 1024, caption: "Long Covid Toolkit — treatments overview" },
+      { src: "/images/LongCovidMedicine.png", ratio: 1438 / 1234, caption: "Long Covid Toolkit: medicine effectiveness & evidence" },
+      { src: "/images/LongCovidTreatments.png", ratio: 1440 / 1024, caption: "Long Covid Toolkit: treatments overview" },
     ],
     caseStudy: {
       intro:
@@ -210,7 +210,7 @@ export const projects: ReadonlyArray<Project> = [
       sections: [
         {
           heading: "The challenge",
-          body: "Long Covid patients are dealing with dozens of fluctuating symptoms, a medical community still catching up, and an internet full of misinformation. The toolkit needed to be rigorously evidence-based and clinician-approved, while also being accessible, non-overwhelming, and empowering — not clinical and cold.",
+          body: "Long Covid patients are dealing with dozens of fluctuating symptoms, a medical community still catching up, and an internet full of misinformation. The toolkit needed to be rigorously evidence-based and clinician-approved, while also being accessible, non-overwhelming and empowering, not clinical and cold.",
         },
         {
           heading: "Design process",

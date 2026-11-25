@@ -137,7 +137,7 @@ function WorkRow({ project: p, index, onOpenCaseStudy, onOpenGallery }: WorkRowP
           </button>
           <p className="mt-4 text-lg text-stone-600">
             {p.tagline}
-            <span className="text-stone-400"> — {p.role}</span>
+            <span className="text-stone-400"> · {p.role}</span>
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">

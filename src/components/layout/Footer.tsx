@@ -10,7 +10,7 @@ function Footer() {
     >
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
         <p className="text-sm font-medium text-white/50">
-          &copy; 2026 Ruben Baggen &mdash; Utrecht, NL
+          &copy; 2026 Ruben Baggen · Utrecht, NL
         </p>
         <nav className="flex gap-6 text-sm font-medium text-white/50">
           <a href="#about" className="hover:text-white">About</a>

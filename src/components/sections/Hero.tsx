@@ -191,7 +191,7 @@ function Hero() {
         <FadeIn immediate delay={0.4} duration={0.9}>
           <p className="mb-16 max-w-[620px] text-[22px] leading-[1.55] text-stone-600">
             I work at the intersection of technology, product strategy and user
-            experience &mdash; shaping products from vision to launch. Currently
+            experience, shaping products from vision to launch. Currently
             leading IT at Brand Boekhouders.
           </p>
         </FadeIn>
