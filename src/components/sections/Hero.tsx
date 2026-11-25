@@ -243,8 +243,12 @@ function Sticker({ reduced }: { reduced: boolean }) {
         <defs>
           <path id="sticker-path" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0" />
         </defs>
-        <text className="fill-white font-display text-[21px] tracking-[0.12em]">
-          <textPath href="#sticker-path">Product • Design • Build • Product • Design • Build •</textPath>
+        {/* One loop of text, stretched to the circle's circumference
+            (2π × 72 ≈ 452) minus one gap, so nothing gets cut off. */}
+        <text className="fill-white font-display text-[23px]">
+          <textPath href="#sticker-path" textLength="440" lengthAdjust="spacing">
+            Product • Design • Build •
+          </textPath>
         </text>
       </svg>
       <span className="absolute inset-0 flex items-center justify-center">
